@@ -88,26 +88,26 @@ body,
   outline: none;
 }
 
-/* Active sidebar nav item */
+/* Active sidebar nav item: signal field, ink text */
 .nav-active {
-  background: var(--brand-50);
-  color: var(--brand-700);
+  background: var(--signal);
+  color: var(--signal-ink);
 }
 
 [data-theme="dark"] .nav-active {
-  background: rgba(99, 102, 241, 0.15);
-  color: var(--brand-300);
+  background: var(--signal);
+  color: var(--signal-ink);
 }
 
-/* Guest mode banner */
+/* Guest mode banner: signal strip */
 .guest-banner {
-  border-color: var(--brand-200);
-  background: var(--brand-50);
-  color: var(--brand-800);
+  border-color: var(--signal-ink);
+  background: var(--signal);
+  color: var(--signal-ink);
 }
 
 [data-theme="dark"] .guest-banner {
-  border-color: rgba(99, 102, 241, 0.35);
-  background: rgba(99, 102, 241, 0.12);
-  color: var(--brand-200);
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--signal-ink);
 }

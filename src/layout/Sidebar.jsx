@@ -1,16 +1,27 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import ThemeToggle from "../components/ThemeToggle.jsx";
 import UserMenu from "../components/UserMenu.jsx";
 
+// Slim ink rail on desktop, bottom tab bar on phones. Chat is in the rail:
+// it is the main entry point for users with connected platforms.
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: "home" },
+  { to: "/chat", label: "Chat", icon: "chat" },
   { to: "/create", label: "Create Campaign", icon: "plus" },
   { to: "/campaigns", label: "My Campaigns", icon: "folder" },
   { to: "/analytics", label: "Analytics", icon: "chart" },
   { to: "/idea-generator", label: "Idea Generator", icon: "lightbulb" },
   { to: "/settings", label: "Settings", icon: "gear" },
   { to: "/help-support", label: "Help & Support", icon: "help" },
+];
+
+const mobileItems = [
+  { to: "/dashboard", label: "Board", icon: "home" },
+  { to: "/chat", label: "Chat", icon: "chat" },
+  { to: "/create", label: "Create", icon: "plus", raised: true },
+  { to: "/campaigns", label: "Posts", icon: "folder" },
+  { to: "/settings", label: "Settings", icon: "gear" },
 ];
 
 function Icon({ name, className }) {
@@ -20,6 +31,13 @@ function Icon({ name, className }) {
       return (
         <svg className={clsx(base, className)} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-10.5z" />
+        </svg>
+      );
+    case "chat":
+      return (
+        <svg className={clsx(base, className)} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M21 12a8 8 0 0 1-8 8H4l2.3-2.9A8 8 0 1 1 21 12z" />
+          <path d="M8 11h.01M12 11h.01M16 11h.01" strokeLinecap="round" />
         </svg>
       );
     case "plus":
@@ -71,50 +89,95 @@ function Icon({ name, className }) {
 
 function Sidebar() {
   const { pathname } = useLocation();
-  return (
-    <aside className="app-sidebar fixed left-0 top-0 h-full w-[260px] flex flex-col z-20 border-r border-[var(--border)]">
-      <div className="h-16 flex items-center justify-between px-5 border-b border-[var(--border)]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-xs">AA</span>
-          </div>
-          <div className="leading-tight">
-            <div className="font-semibold text-[15px] text-[var(--text)]">Agent Anywhere</div>
-            <div className="text-xs text-[var(--text-muted)]">Social Media Agent</div>
-          </div>
-        </div>
-        <ThemeToggle />
-      </div>
+  const isActive = (to) => pathname === to || pathname.startsWith(to + "/");
 
-      <nav className="flex-1 overflow-y-auto py-4" aria-label="Main navigation">
-        <ul className="px-3 space-y-1">
-          {navItems.map((item) => {
-            const active = pathname === item.to || pathname.startsWith(item.to + "/");
+  return (
+    <>
+      <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-full w-[76px] flex-col border-r border-[var(--border)] md:flex">
+        <div className="flex h-16 items-center justify-center border-b border-white/10">
+          <Link to="/dashboard" aria-label="Agent Anywhere home" className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-[var(--signal)] transition-transform duration-200 hover:-translate-y-0.5">
+            <span className="font-display text-sm font-bold text-[var(--signal-ink)]">AA</span>
+          </Link>
+        </div>
+
+        <nav className="flex-1 overflow-y-auto py-4" aria-label="Main navigation">
+          <ul className="flex flex-col items-center gap-1 px-2">
+            {navItems.map((item) => {
+              const active = isActive(item.to);
+              return (
+                <li key={item.to}>
+                  <NavLink
+                    to={item.to}
+                    title={item.label}
+                    aria-label={item.label}
+                    className={clsx(
+                      "flex h-11 w-11 items-center justify-center rounded-[4px] transition-all duration-150",
+                      active
+                        ? "nav-active"
+                        : "text-[var(--ink-field-muted)] hover:bg-white/10 hover:text-[var(--ink-field-text)]"
+                    )}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <Icon name={item.icon} className="h-5 w-5" />
+                  </NavLink>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className="flex flex-col items-center gap-3 border-t border-white/10 py-4">
+          <ThemeToggle />
+          <UserMenu compact direction="up" align="left" tone="ink" />
+        </div>
+      </aside>
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border)] bg-[var(--surface)] pb-[env(safe-area-inset-bottom)] md:hidden"
+        aria-label="Main navigation"
+      >
+        <ul className="grid grid-cols-5 items-end">
+          {mobileItems.map((item) => {
+            const active = isActive(item.to);
+            if (item.raised) {
+              return (
+                <li key={item.to} className="flex justify-center">
+                  <NavLink
+                    to={item.to}
+                    aria-label={item.label}
+                    className="flex h-12 w-12 -translate-y-3 items-center justify-center rounded-[6px] bg-[var(--signal)] text-[var(--signal-ink)] shadow-[var(--shadow-hard-sm)] transition-transform duration-150 active:translate-y-0"
+                  >
+                    <Icon name={item.icon} className="h-6 w-6" />
+                  </NavLink>
+                </li>
+              );
+            }
             return (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
                   className={clsx(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    active
-                      ? "nav-active"
-                      : "text-[var(--text-muted)] hover:bg-[var(--bg-muted)] hover:text-[var(--text)]"
+                    "flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold",
+                    active ? "text-[var(--text)]" : "text-[var(--text-muted)]"
                   )}
                   aria-current={active ? "page" : undefined}
                 >
-                  <Icon name={item.icon} className="w-5 h-5" />
-                  <span>{item.label}</span>
+                  <span
+                    className={clsx(
+                      "flex h-9 w-11 items-center justify-center rounded-[4px] transition-colors",
+                      active && "nav-active"
+                    )}
+                  >
+                    <Icon name={item.icon} className="h-5 w-5" />
+                  </span>
+                  {item.label}
                 </NavLink>
               </li>
             );
           })}
         </ul>
       </nav>
-
-      <div className="p-4 border-t border-[var(--border)]">
-        <UserMenu />
-      </div>
-    </aside>
+    </>
   );
 }
 
