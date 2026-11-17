@@ -192,21 +192,17 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 flex items-center justify-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cg%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Cg%20fill%3D%22%239C92AC%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-40"></div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo/Brand */}
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gradient-primary-start to-gradient-primary-end flex items-center justify-center">
-            <span className="text-2xl font-bold text-white">SM</span>
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--primary)] flex items-center justify-center shadow-sm">
+            <span className="text-lg font-bold text-white">AA</span>
           </div>
-          <h1 className="text-3xl font-bold text-[var(--text)] mb-2">Create Account</h1>
-          <p className="text-[var(--text-muted)]">Join Social Media Agent and start creating amazing content</p>
+          <h1 className="text-2xl font-semibold text-[var(--text)] mb-1">Create your account</h1>
+          <p className="text-sm text-[var(--text-muted)]">Set up Agent Anywhere and start planning your posts.</p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-6 sm:p-8">
           {error && (
             <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
               {error}
@@ -252,11 +248,10 @@ function Register() {
                 <div className="w-full border-t border-[var(--border)]"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-[var(--background)] text-[var(--text-muted)]">Or create account with email</span>
+                <span className="px-2 bg-[var(--surface)] text-[var(--text-muted)]">Or create account with email</span>
               </div>
             </div>
 
-            {/* Email/Password Form (for future use) */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-[var(--text)] mb-2">

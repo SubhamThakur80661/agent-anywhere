@@ -610,7 +610,7 @@ export default function IdeaGenerator() {
           className={`px-8 py-3 rounded-2xl font-semibold shadow-lg transition-all duration-300 transform ${
             isGenerating || platforms.length === 0 || goals.length === 0
               ? 'bg-gray-400 cursor-not-allowed text-white'
-              : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white hover:shadow-xl hover:scale-105'
+              : 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white'
           }`}
         >
           {isGenerating ? (
@@ -622,14 +622,14 @@ export default function IdeaGenerator() {
               Generating...
             </>
           ) : (
-            '✨ Generate Ideas'
+            'Generate ideas'
           )}
         </button>
         <button
           onClick={handleClear}
           className="glass-hover bg-[var(--surface)] text-[var(--text)] px-8 py-3 rounded-2xl font-medium border border-[var(--border)] hover:bg-[var(--bg-muted)] transition-all duration-300"
         >
-          🗑️ Clear All
+          Clear all
         </button>
       </div>
       </div>
@@ -638,8 +638,8 @@ export default function IdeaGenerator() {
       {generatedIdeas.length > 0 && (
         <div id="generated-ideas-section" className="space-y-6 relative">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-[var(--text)] mb-2">🎉 Generated Ideas</h2>
-            <p className="text-sm text-[var(--text-muted)]">Here are {generatedIdeas.length} trending content ideas tailored for your audience</p>
+            <h2 className="text-xl font-semibold text-[var(--text)] mb-2">Generated ideas</h2>
+            <p className="text-sm text-[var(--text-muted)]">{generatedIdeas.length} ideas based on what you asked for</p>
           </div>
           
           <div className="flex flex-col items-center">
@@ -746,9 +746,9 @@ export default function IdeaGenerator() {
               <div>
                 <h2 className="text-xl font-semibold text-[var(--text)] mb-2">{selectedIdea.title}</h2>
                 <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
-                  <span>🔥 Trending Score: {selectedIdea.trending_score}%</span>
-                  <span>📊 Est. Engagement: {selectedIdea.estimated_engagement}/10</span>
-                  <span>⏰ {selectedIdea.best_time_to_post}</span>
+                  <span>Trending score: {selectedIdea.trending_score}%</span>
+                  <span>Est. engagement: {selectedIdea.estimated_engagement}/10</span>
+                  <span>Best time to post: {selectedIdea.best_time_to_post}</span>
                 </div>
               </div>
             </div>
@@ -758,14 +758,14 @@ export default function IdeaGenerator() {
               <div className="space-y-6">
                 {/* Description */}
                 <div>
-                  <h3 className="font-semibold text-[var(--text)] mb-2">📝 Detailed Description</h3>
+                  <h3 className="font-semibold text-[var(--text)] mb-2">Description</h3>
                   <p className="text-[var(--text-muted)] leading-relaxed whitespace-pre-wrap">{selectedIdea.description}</p>
                 </div>
 
                 {/* Why This Will Go Viral */}
                 {selectedIdea.why_viral && (
                   <div>
-                    <h3 className="font-semibold text-[var(--text)] mb-2">🚀 Why This Will Go Viral</h3>
+                    <h3 className="font-semibold text-[var(--text)] mb-2">Why it could work</h3>
                     <p className="text-[var(--text-muted)] leading-relaxed">{selectedIdea.why_viral}</p>
                   </div>
                 )}
@@ -773,7 +773,7 @@ export default function IdeaGenerator() {
                 {/* Execution Tips */}
                 {selectedIdea.execution_tips && (
                   <div>
-                    <h3 className="font-semibold text-[var(--text)] mb-2">💡 Execution Tips</h3>
+                    <h3 className="font-semibold text-[var(--text)] mb-2">How to pull it off</h3>
                     <ul className="space-y-1">
                       {Array.isArray(selectedIdea.execution_tips) 
                         ? selectedIdea.execution_tips.map((tip, idx) => (
@@ -791,7 +791,7 @@ export default function IdeaGenerator() {
                 {/* Hashtags */}
                 {selectedIdea.hashtags && selectedIdea.hashtags.length > 0 && (
                   <div>
-                    <h3 className="font-semibold text-[var(--text)] mb-2"># Suggested Hashtags</h3>
+                    <h3 className="font-semibold text-[var(--text)] mb-2">Suggested hashtags</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedIdea.hashtags.map((hashtag, idx) => (
                         <span key={idx} className="px-3 py-1 bg-[var(--bg-muted)] text-[var(--primary)] text-sm rounded-full">
@@ -804,7 +804,7 @@ export default function IdeaGenerator() {
 
                 {/* Target Audience */}
                 <div>
-                  <h3 className="font-semibold text-[var(--text)] mb-2">🎯 Target Audience</h3>
+                  <h3 className="font-semibold text-[var(--text)] mb-2">Target audience</h3>
                   <p className="text-[var(--text-muted)]">{selectedIdea.target_audience}</p>
                 </div>
               </div>

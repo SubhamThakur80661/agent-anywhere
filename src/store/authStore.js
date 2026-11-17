@@ -9,6 +9,7 @@ const useAuthStore = create(
             user: null,
             token: null,
             isAuthenticated: false,
+            isGuest: false,
             isLoading: false,
             error: null,
             walletAddress: null, // Connected Solana wallet
@@ -17,6 +18,8 @@ const useAuthStore = create(
             setUser: (user) => set({ user, isAuthenticated: !!user }),
 
             setToken: (token) => set({ token }),
+
+            setGuest: (isGuest) => set({ isGuest }),
 
             setLoading: (isLoading) => set({ isLoading }),
 
@@ -75,6 +78,7 @@ const useAuthStore = create(
                         token: data.access_token,
                         walletAddress: walletAddress,
                         isAuthenticated: true,
+                        isGuest: false,
                         isLoading: false,
                         error: null,
                     });
@@ -88,6 +92,7 @@ const useAuthStore = create(
                         token: null,
                         walletAddress: null,
                         isAuthenticated: false,
+                        isGuest: false,
                         isLoading: false,
                         error: error.message,
                     });
@@ -203,6 +208,7 @@ const useAuthStore = create(
                         user: data.user,
                         token: data.access_token,
                         isAuthenticated: true,
+                        isGuest: false,
                         isLoading: false,
                         error: null,
                     });
@@ -213,6 +219,7 @@ const useAuthStore = create(
                         user: null,
                         token: null,
                         isAuthenticated: false,
+                        isGuest: false,
                         isLoading: false,
                         error: error.message,
                     });
@@ -226,9 +233,57 @@ const useAuthStore = create(
                     token: null,
                     walletAddress: null,
                     isAuthenticated: false,
+                    isGuest: false,
                     isLoading: false,
                     error: null,
                 });
+            },
+
+            // Guest (demo) login: no credentials. Guests can look around and
+            // try content generation, but cannot connect accounts or publish.
+            loginAsGuest: async () => {
+                set({ isLoading: true, error: null });
+
+                try {
+                    const response = await fetch(apiUrl('/auth/guest'), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    if (!response.ok) {
+                        let errorMessage = 'Guest login failed';
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.detail || errorData.message || errorMessage;
+                        } catch {
+                            errorMessage = response.statusText || errorMessage;
+                        }
+                        throw new Error(errorMessage);
+                    }
+
+                    const data = await response.json();
+
+                    set({
+                        user: data.user,
+                        token: data.access_token,
+                        isAuthenticated: true,
+                        isGuest: true,
+                        isLoading: false,
+                        error: null,
+                    });
+
+                    return { success: true, user: data.user };
+                } catch (error) {
+                    set({
+                        user: null,
+                        token: null,
+                        isAuthenticated: false,
+                        isGuest: false,
+                        isLoading: false,
+                        error: error.message,
+                    });
+                    return { success: false, error: error.message };
+                }
             },
 
             getCurrentUser: async () => {
@@ -249,7 +304,7 @@ const useAuthStore = create(
                     }
 
                     const user = await response.json();
-                    set({ user, isLoading: false });
+                    set({ user, isGuest: !!user.is_guest, isLoading: false });
                     return user;
                 } catch (error) {
                     set({ isLoading: false, error: error.message });
@@ -268,6 +323,7 @@ const useAuthStore = create(
                     token: null,
                     walletAddress: null,
                     isAuthenticated: false,
+                    isGuest: false,
                     isLoading: false,
                     error: null,
                 });
@@ -280,6 +336,7 @@ const useAuthStore = create(
                 token: state.token,
                 walletAddress: state.walletAddress,
                 isAuthenticated: state.isAuthenticated,
+                isGuest: state.isGuest,
             }),
         }
     )

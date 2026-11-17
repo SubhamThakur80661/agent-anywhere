@@ -78,10 +78,14 @@ function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
-  const { user, logout } = useAuthStore();
+  const { user, logout, isGuest } = useAuthStore();
 
   // Delete account function
   const handleDeleteAccount = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't be deleted. Sign out to leave guest mode.");
+      return;
+    }
     setDeleteLoading(true);
     try {
       const response = await apiClient.deleteAccount();
@@ -113,6 +117,10 @@ function Settings() {
 
   // Handler to save Instagram static credentials
   const handleSaveInstagramCredentials = async (credentials) => {
+    if (isGuest) {
+      toast.error("Guest accounts can't connect social accounts. Create a free account to do that.");
+      return false;
+    }
     try {
       const payload = {
         user_id: user?.id || 'demo_user_123',
@@ -131,7 +139,7 @@ function Settings() {
         const data = await response.json();
         toast.success(data.message || 'Instagram connected successfully!');
         setSocialMediaModal({ open: false, platform: null });
-        await checkSocialMediaPlatformStatus('instagram');
+        await checkAllSocialMediaStatus();
         return true;
       } else {
         const errorData = await response.json();
@@ -263,6 +271,10 @@ function Settings() {
   };
 
   const connectToGoogle = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't connect Google. Create a free account to do that.");
+      return;
+    }
     try {
       setLoading(true);
       // Open Google OAuth in a new window
@@ -315,6 +327,10 @@ function Settings() {
   };
 
   const connectToGoogleCalendar = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't connect Google. Create a free account to do that.");
+      return;
+    }
     try {
       setCalendarLoading(true);
       // Open Google OAuth in a new window
@@ -367,6 +383,10 @@ function Settings() {
   };
 
   const disconnectGoogle = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't change Google connections.");
+      return;
+    }
     try {
       setLoading(true);
       const response = await apiFetch("/google/disconnect", { method: "POST" });
@@ -387,6 +407,10 @@ function Settings() {
   };
 
   const disconnectGoogleCalendar = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't change Google connections.");
+      return;
+    }
     try {
       setLoading(true);
       const response = await apiFetch("/google/disconnect", { method: "POST" });
@@ -456,6 +480,10 @@ function Settings() {
   };
 
   const handleSocialMediaConnect = async (platform) => {
+    if (isGuest) {
+      toast.error("Guest accounts can't connect social accounts. Create a free account to do that.");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -542,6 +570,10 @@ function Settings() {
   };
 
   const handleSocialMediaDisconnect = async (platform, accountId = null) => {
+    if (isGuest) {
+      toast.error("Guest accounts can't change social connections.");
+      return;
+    }
     try {
       console.log(`🔌 Disconnecting ${platform} account:`, accountId);
 
@@ -701,41 +733,16 @@ function Settings() {
             const st = platformStatus[platform];
             const Icon = cfg.icon;
 
-            // Platform stats + background images (hero area)
-            const platformStats = {
-              facebook: { users: '3.0B+ users', note: 'High engagement', handle: '@yourbusiness' },
-              instagram: { users: '2.4B+ users', note: 'Visual content', handle: '@yourbrand' },
-              twitter: { users: '550M+ users', note: 'Real-time updates', handle: '@yourhandle' },
-              reddit: { users: '430M+ users', note: 'Community driven', handle: 'r/yourcommunity' },
-            }[platform];
-
-            const platformBg = {
-              facebook: 'https://images.unsplash.com/photo-1729860648432-723ae383cad9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmYWNlYm9vayUyMG1vYmlsZSUyMGFwcHxlbnwxfHx8fDE3NjE3MjQ2NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-              instagram: 'https://images.unsplash.com/photo-1759912255512-c5e56b4e5e82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbnN0YWdyYW0lMjBhcHAlMjBpbnRlcmZhY2V8ZW58MXx8fHwxNzYxNzI0NjQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-              twitter: 'https://images.unsplash.com/photo-1743582733049-dcb16521f6fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0d2l0dGVyJTIwc29jaWFsJTIwbWVkaWF8ZW58MXx8fHwxNzYxNzI0NjQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-              reddit: 'https://images.unsplash.com/photo-1734004691776-d7f04732c174?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2NpYWwlMjBtZWRpYSUyMHdvcmtzcGFjZSUyMG1vZGVybnxlbnwxfHx8fDE3NjE3MjQ2NDd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-            }[platform];
-
             return (
               <div
                 key={platform}
-                className={`relative rounded-2xl overflow-hidden border-2 bg-white shadow-sm ${st.connected ? 'border-green-400 ring-1 ring-green-300' : 'border-gray-200'}`}
+                className={`relative rounded-xl overflow-hidden border bg-[var(--surface)] shadow-sm ${st.connected ? 'border-green-400 ring-1 ring-green-300' : 'border-[var(--border)]'}`}
               >
-                {/* Hero background */}
-                <div className="relative h-36 md:h-40">
-                  <div
-                    className="absolute inset-0 bg-center bg-cover"
-                    style={{ backgroundImage: `url('${platformBg}')` }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-white/10 to-white" />
-
-                  {/* Platform icon */}
-                  <div className={`absolute top-3 left-3 w-11 h-11 ${cfg.color} rounded-xl flex items-center justify-center shadow-md`}>
+                <div className="flex items-center justify-between px-5 pt-5">
+                  <div className={`w-11 h-11 ${cfg.color} rounded-xl flex items-center justify-center shadow-sm`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
-
-                  {/* Status badge */}
-                  <span className={`absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${st.connected && st.accounts && st.accounts.length > 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                  <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${st.connected && st.accounts && st.accounts.length > 0 ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                     <span className={`w-2 h-2 rounded-full ${st.connected && st.accounts && st.accounts.length > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
                     {st.connected && st.accounts && st.accounts.length > 0 ? 'Active' : 'Disconnected'}
                   </span>
@@ -815,19 +822,6 @@ function Settings() {
                     </div>
                   )}
 
-                  <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-gray-700">
-                    <div className="flex items-center gap-3">
-                      <span className="text-gray-600">{platformStats.users}</span>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-600">{platformStats.note}</span>
-                    </div>
-                    <div>
-                      <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs border ${st.connected ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-600'}`}>
-                        ✓ {platformStats.handle}
-                      </span>
-                    </div>
-                  </div>
-
                   <div className="mt-4 flex items-center gap-3">
                     {st.connected ? (
                       <>
@@ -857,8 +851,9 @@ function Settings() {
                     ) : (
                       <button
                         onClick={() => handleSocialMediaConnect(platform)}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90"
-                        disabled={st.checking}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={st.checking || isGuest}
+                        title={isGuest ? "Connecting accounts is disabled for guests" : undefined}
                       >
                         Connect Now
                       </button>
@@ -883,16 +878,11 @@ function Settings() {
         {/* Google Integrations */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-            {/* Hero background */}
-            <div className="relative -mx-5 -mt-5 h-32 md:h-36 overflow-hidden rounded-t-xl">
-              <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1600&auto=format&fit=crop')" }} />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-white/10 to-white" />
-              {/* Icon */}
-              <div className="absolute top-3 left-3 w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
                 <HardDrive className="w-6 h-6 text-white" />
               </div>
-              {/* Status */}
-              <span className={`absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${driveConnected ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+              <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${driveConnected ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                 <span className={`w-2 h-2 rounded-full ${driveConnected ? 'bg-green-500' : 'bg-red-500'}`} />
                 {driveConnected ? 'Active' : 'Disconnected'}
               </span>
@@ -915,7 +905,7 @@ function Settings() {
                     <span className="text-lg leading-none">✖</span> Disconnect
                   </button>
                 ) : (
-                  <button onClick={connectToGoogle} disabled={loading} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90">
+                  <button onClick={connectToGoogle} disabled={loading || isGuest} title={isGuest ? "Connecting Google is disabled for guests" : undefined} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
                     Connect Now
                   </button>
                 )}
@@ -927,16 +917,11 @@ function Settings() {
           </Card>
 
           <Card>
-            {/* Hero background */}
-            <div className="relative -mx-5 -mt-5 h-32 md:h-36 overflow-hidden rounded-t-xl">
-              <div className="absolute inset-0 bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=1600&auto=format&fit=crop')" }} />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-white/10 to-white" />
-              {/* Icon */}
-              <div className="absolute top-3 left-3 w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="w-11 h-11 bg-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
                 <CalendarDays className="w-6 h-6 text-white" />
               </div>
-              {/* Status */}
-              <span className={`absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${calendarConnected ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+              <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${calendarConnected ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                 <span className={`w-2 h-2 rounded-full ${calendarConnected ? 'bg-green-500' : 'bg-red-500'}`} />
                 {calendarConnected ? 'Active' : 'Disconnected'}
               </span>
@@ -961,13 +946,13 @@ function Settings() {
                     </button>
                     <button 
                       onClick={() => setShowCalendarModal(true)} 
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       View More
                     </button>
                   </>
                 ) : (
-                  <button onClick={connectToGoogleCalendar} disabled={calendarLoading || loading} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:opacity-90">
+                  <button onClick={connectToGoogleCalendar} disabled={calendarLoading || loading || isGuest} title={isGuest ? "Connecting Google is disabled for guests" : undefined} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white bg-[var(--primary)] hover:bg-[var(--primary-hover)] disabled:opacity-50 disabled:cursor-not-allowed">
                     Connect Now
                   </button>
                 )}

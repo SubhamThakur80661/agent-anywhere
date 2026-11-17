@@ -1282,7 +1282,7 @@ function Analytics() {
                     ))
                 ) : (
                   <div className="text-center py-8">
-                    <div className="text-gray-400 mb-2">📊</div>
+                    
                     <div className="text-gray-500 text-sm">Instagram doesn't provide country demographics</div>
                     <div className="text-gray-400 text-xs mt-1">Try Facebook for audience insights</div>
                   </div>
@@ -1337,7 +1337,7 @@ function Analytics() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl border border-orange-200 hover:shadow-md transition-all">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">⭐</span>
+                        
                         <span className="text-gray-700 font-medium">Total Karma</span>
                       </div>
                       <span className="font-bold text-orange-600 text-lg">{formatNumber(analyticsData.status.account_info.total_karma || 0)}</span>
@@ -1351,14 +1351,14 @@ function Analytics() {
                     </div>
                     <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl border border-purple-200 hover:shadow-md transition-all">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">💬</span>
+                        
                         <span className="text-gray-700 font-medium">Comment Karma</span>
                       </div>
                       <span className="font-bold text-purple-600 text-lg">{formatNumber(analyticsData.status.account_info.comment_karma || 0)}</span>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200 hover:shadow-md transition-all">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">📅</span>
+                        
                         <span className="text-gray-700 font-medium">Account Age</span>
                       </div>
                       <span className="font-bold text-green-600 text-lg">{analyticsData.status.account_info.created_utc ? Math.floor((Date.now() - analyticsData.status.account_info.created_utc * 1000) / (1000 * 60 * 60 * 24)) + " days" : "Unknown"}</span>
@@ -1383,9 +1383,9 @@ function Analytics() {
                   </div>
                   <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <div className="text-sm text-gray-600 space-y-2">
-                      <div className="flex items-center gap-2"><span className="text-green-600">✅</span> Account info: Available</div>
-                      <div className="flex items-center gap-2"><span className="text-red-600">❌</span> Tweet content: Restricted</div>
-                      <div className="flex items-center gap-2"><span className="text-red-600">❌</span> Engagement metrics: Restricted</div>
+                      <div className="flex items-center gap-2"><span className="text-green-600">Yes</span> Account info: Available</div>
+                      <div className="flex items-center gap-2"><span className="text-red-600">No</span> Tweet content: Restricted</div>
+                      <div className="flex items-center gap-2"><span className="text-red-600">No</span> Engagement metrics: Restricted</div>
                     </div>
                   </div>
                 </div>

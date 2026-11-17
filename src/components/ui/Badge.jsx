@@ -2,17 +2,17 @@ import clsx from "clsx";
 
 function Badge({ color = "gray", className, children }) {
   const map = {
-    gray: "bg-[var(--card)] text-[var(--fg)] border-[var(--border)]",
-    green: "bg-green-600/10 text-green-400 border-green-600/20",
-    yellow: "bg-yellow-500/10 text-yellow-300 border-yellow-500/20",
-    red: "bg-[var(--destructive)]/10 text-[var(--destructive)] border-[var(--destructive)]/20",
-    blue: "bg-blue-600/10 text-blue-300 border-blue-600/20",
-    primary: "bg-gradient-primary/20 text-white border-[var(--border)]",
+    gray: "bg-[var(--bg-muted)] text-[var(--text-muted)] border-[var(--border)]",
+    green: "bg-green-50 text-green-700 border-green-200",
+    yellow: "bg-amber-50 text-amber-700 border-amber-200",
+    red: "bg-red-50 text-red-700 border-red-200",
+    blue: "bg-blue-50 text-blue-700 border-blue-200",
+    primary: "bg-[var(--brand-50)] text-[var(--brand-700)] border-[var(--brand-200)]",
   };
   return (
     <span
       className={clsx(
-        "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-sm border transition-all duration-300 hover:scale-105",
+        "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border",
         map[color] || map.gray,
         className
       )}

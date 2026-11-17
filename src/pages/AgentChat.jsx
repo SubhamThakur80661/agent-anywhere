@@ -539,26 +539,27 @@ const AgentChat = () => {
 
   const generateFallbackResponse = (msg) => {
     const lower = msg.toLowerCase();
+    const offlineNote = "I couldn't reach the assistant just now, so here's a starting point instead. Try again in a moment.";
     if (lower.includes('post') || lower.includes('generate')) {
-      return `## 🚀 Here's an engaging post for you:\n\n> "Building the future of social media automation with AI. 🤖✨\n>\n> Imagine scheduling posts, analyzing trends, and generating content - all with a single conversation.\n>\n> The future is here. Are you ready? 👇\n>\n> #AI #SocialMedia #Automation #Web3"\n\n**What's next?**\n- Generate variations\n- Schedule this post\n- Create more content`;
+      return `${offlineNote}\n\nHere's a draft you can edit:\n\n> We just shipped something we've been working on for a while. Here's what it does, and why we built it.\n\nTell me what you're posting about and I'll draft a version for it.`;
     }
     if (lower.includes('campaign')) {
-      return `## 📊 Campaign Structure Ready!\n\n**Week 1: Awareness Phase**\n- 3 teaser posts across platforms\n- 1 behind-the-scenes video\n\n**Week 2: Engagement Phase**\n- Interactive polls and Q&As\n- User-generated content contest\n\n**Week 3: Launch Phase**\n- Main announcement\n- Influencer collaborations\n\nShall I generate the content for each phase?`;
+      return `${offlineNote}\n\nA simple three-week shape that works for most launches:\n\n**Week 1: Tease it**\n- A few short posts hinting at what's coming\n- One behind-the-scenes post\n\n**Week 2: Get people involved**\n- A question or poll your audience can answer\n- Repost or highlight something a customer said\n\n**Week 3: Launch**\n- The announcement itself\n- A follow-up answering the most common question\n\nWant me to draft the posts for one of these weeks?`;
     }
     if (lower.includes('idea') || lower.includes('trending')) {
-      return `## 📈 Trending Topics Right Now:\n\n1. **AI & Automation** - Very high engagement\n2. **Crypto market updates** - Trending on Twitter\n3. **Year-end reflections** - Seasonal content\n4. **2025 predictions** - High shareability\n5. **Behind-the-scenes content** - Strong authenticity signals\n\nWhich topic would you like me to create content around?`;
+      return `${offlineNote}\n\nI can't pull live trends while I'm offline. The Idea Generator page can still suggest topics once the connection is back, or tell me your niche and I'll brainstorm from that.`;
     }
     if (lower.includes('schedule')) {
-      return `## 📅 Optimal Posting Times\n\n| Platform | Best Times |\n|----------|------------|\n| **Twitter/X** | 9 AM, 12 PM, 5 PM |\n| **Instagram** | 11 AM, 2 PM, 7 PM |\n| **LinkedIn** | 7 AM, 12 PM, 5 PM |\n\n**Next steps:**\n1. Create a week's worth of content\n2. Schedule specific posts\n3. Analyze your best performing times`;
+      return `${offlineNote}\n\nYour own Analytics page is the best guide to when your audience is online. As a rough starting point, weekday late mornings tend to do well on most platforms — but check your numbers before settling on times.`;
     }
-    return `I can help you with:\n\n- 📝 **Create Content** - Generate posts, threads, captions\n- 📅 **Schedule & Plan** - Find optimal posting times\n- 📈 **Analyze & Optimize** - Review performance metrics\n- 💡 **Generate Ideas** - Viral content suggestions\n\nWhat would you like to do?`;
+    return `${offlineNote}\n\nI can help you with:\n\n- **Create content** - Draft posts, threads, captions\n- **Plan** - Sketch out a campaign week by week\n- **Review** - Look at what's working and what isn't\n\nWhat would you like to do?`;
   };
 
   const quickActions = [
-    { icon: Rocket, title: 'Create Campaign', description: 'Generate a full content campaign with AI', gradient: 'bg-gradient-to-br from-[#9945FF] to-[#6366F1]', prompt: 'Create a 2-week marketing campaign for my crypto project' },
-    { icon: Lightbulb, title: 'Content Ideas', description: 'Get trending viral content suggestions', gradient: 'bg-gradient-to-br from-[#14F195] to-[#10B981]', prompt: 'Give me 5 viral content ideas for Twitter' },
-    { icon: Calendar, title: 'Schedule Posts', description: 'Find optimal posting times for engagement', gradient: 'bg-gradient-to-br from-[#00D4FF] to-[#3B82F6]', prompt: 'What are the best times to post on Instagram?' },
-    { icon: BarChart3, title: 'Analytics', description: 'Review your performance metrics', gradient: 'bg-gradient-to-br from-[#F59E0B] to-[#EF4444]', prompt: 'Show me my analytics for the past week' },
+    { icon: Rocket, title: 'Create Campaign', description: 'Plan a content campaign with AI', gradient: 'bg-[var(--primary)]', prompt: 'Help me plan a 2-week campaign for my product launch' },
+    { icon: Lightbulb, title: 'Content Ideas', description: 'Get content suggestions for your audience', gradient: 'bg-[var(--success)]', prompt: 'Give me 5 content ideas for Twitter' },
+    { icon: Calendar, title: 'Schedule Posts', description: 'Find good posting times for your audience', gradient: 'bg-[var(--info)]', prompt: 'What are the best times to post on Instagram?' },
+    { icon: BarChart3, title: 'Analytics', description: 'Review your performance metrics', gradient: 'bg-[var(--warning)]', prompt: 'Show me my analytics for the past week' },
   ];
 
   return (
