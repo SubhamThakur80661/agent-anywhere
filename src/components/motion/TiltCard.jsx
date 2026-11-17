@@ -4,7 +4,7 @@ import { ensureGsap, motionOK, finePointer } from "../../lib/motion.js";
 // Card that tilts toward the cursor (3D, max a few degrees) with a soft light
 // reflection that follows the pointer. Transform and opacity only, desktop
 // fine pointers only. Without motion it is a plain wrapper.
-function TiltCard({ children, className = "", max = 4, glare = true }) {
+function TiltCard({ children, className = "", max = 4 }) {
   const ref = useRef(null);
 
   const onMove = (e) => {
@@ -44,7 +44,7 @@ function TiltCard({ children, className = "", max = 4, glare = true }) {
       onMouseLeave={onLeave}
     >
       {children}
-      {glare && <div className="aa-tilt-glare" aria-hidden="true" />}
+      <div className="aa-tilt-glare" aria-hidden="true" />
     </div>
   );
 }

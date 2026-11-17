@@ -16,8 +16,6 @@ export function ensureGsap() {
 // Motion verb for the whole app: snap into place. One ease family, related
 // durations. expo.out for reveals, power3.out for feedback.
 export const EASE_OUT = "expo.out";
-export const EASE_SOFT = "power3.out";
-export const EASE_SNAP = "expo.inOut";
 
 export function motionOK() {
   if (typeof window === "undefined") return false;
@@ -28,5 +26,3 @@ export function finePointer() {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(pointer: fine)").matches;
 }
-
-export { gsap, ScrollTrigger };

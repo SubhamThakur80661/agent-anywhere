@@ -31,7 +31,7 @@ function AuthShell({ headline, accent = 2, subline, children }) {
         y: 24,
         opacity: 0,
         duration: 0.9,
-        stagger: 0.09,
+        stagger: 0.06,
         delay: 0.45,
         ease: EASE_OUT,
       });
@@ -42,12 +42,12 @@ function AuthShell({ headline, accent = 2, subline, children }) {
   return (
     <div ref={ref} className="min-h-screen bg-[var(--bg)] lg:grid lg:grid-cols-[1.05fr_1fr]">
       {/* Ink board */}
-      <section className="aa-auth-panel board-grid relative hidden lg:flex flex-col justify-between overflow-hidden bg-[var(--ink-field)] text-[var(--ink-field-text)] p-10 xl:p-14">
+      <section className="aa-auth-panel board-grid relative hidden lg:flex flex-col justify-between overflow-hidden bg-[var(--ink-field)] text-[var(--ink-field-text)] p-8 xl:p-12">
         <div
           className="aa-drift pointer-events-none absolute -right-16 top-24 h-56 w-56 rounded-full bg-[var(--signal)] opacity-20 blur-2xl"
           aria-hidden="true"
         />
-        <div className="relative flex items-center justify-between">
+        <div className="relative flex items-center">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-[var(--signal)]">
               <span className="font-display text-sm font-bold text-[var(--signal-ink)]">AA</span>
@@ -56,10 +56,6 @@ function AuthShell({ headline, accent = 2, subline, children }) {
               <div className="font-display text-[15px] font-bold tracking-tight">Agent Anywhere</div>
               <div className="kicker text-[var(--ink-field-muted)]">Social media, on a board</div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="aa-breathe block h-2 w-2 rounded-full bg-[var(--signal)]" aria-hidden="true" />
-            <span className="kicker text-[var(--ink-field-muted)]">Board live</span>
           </div>
         </div>
 
@@ -71,11 +67,11 @@ function AuthShell({ headline, accent = 2, subline, children }) {
             {subline}
           </p>
 
-          <ol className="mt-12 space-y-0 border-t border-white/15">
+          <ol className="mt-8 space-y-0 border-t border-[var(--line-on-ink)]">
             {STEPS.map((step) => (
               <li
                 key={step.n}
-                className="aa-ledger-row flex items-baseline gap-5 border-b border-white/15 py-4"
+                className="aa-ledger-row flex items-baseline gap-5 border-b border-[var(--line-on-ink)] py-3"
               >
                 <span className="font-mono text-xs text-[var(--signal)]">{step.n}</span>
                 <div>
@@ -91,13 +87,13 @@ function AuthShell({ headline, accent = 2, subline, children }) {
           <div className="kicker mb-3 text-[var(--ink-field-muted)]">Posts to</div>
           <Ticker
             items={PLATFORMS}
-            className="border-y border-white/15 py-3 font-mono text-sm text-[var(--ink-field-text)]"
+            className="border-y border-[var(--line-on-ink)] py-3 font-mono text-sm text-[var(--ink-field-text)]"
           />
         </div>
       </section>
 
       {/* Form column */}
-      <section className="flex min-h-screen flex-col justify-center px-5 py-10 sm:px-10 lg:px-14 xl:px-20">
+      <section className="flex min-h-screen flex-col justify-center px-5 py-8 sm:px-10 lg:px-14 xl:px-20">
         <div className="mx-auto w-full max-w-md">
           <div className="mb-8 flex items-center gap-3 lg:hidden" data-auth-intro>
             <div className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-[var(--text)]">

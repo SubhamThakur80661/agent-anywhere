@@ -49,7 +49,7 @@ function UserMenu({ compact = false, direction = "up", align = "right", tone = "
                 onClick={() => setIsOpen(!isOpen)}
                 aria-label="Account menu"
                 aria-expanded={isOpen}
-                className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${tone === 'ink' ? 'hover:bg-white/10' : 'hover:bg-[var(--surface)]'}`}
+                className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${tone === 'ink' ? 'hover:bg-[var(--hover-on-ink)]' : 'hover:bg-[var(--surface)]'}`}
             >
                 <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center">
                     {user.picture_url && !imageError ? (
@@ -113,7 +113,7 @@ function UserMenu({ compact = false, direction = "up", align = "right", tone = "
                                 // Navigate to upgrade page or show upgrade modal
                                 setIsOpen(false);
                             }}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--bg-muted)] rounded-lg transition-colors"
                         >
                             <Crown className="w-4 h-4" />
                             Upgrade to Premium
@@ -121,7 +121,7 @@ function UserMenu({ compact = false, direction = "up", align = "right", tone = "
 
                         <button
                             onClick={handleLogout}
-                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="w-full flex items-center gap-3 px-3 py-2 text-sm text-[var(--danger)] hover:bg-[var(--danger-bg)] rounded-lg transition-colors"
                         >
                             <LogOut className="w-4 h-4" />
                             Sign Out

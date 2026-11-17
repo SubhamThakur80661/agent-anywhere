@@ -204,7 +204,7 @@ function Register() {
       </div>
 
       {error && (
-        <div className="mt-6 rounded-[4px] border border-red-300 bg-red-50 p-3 text-sm text-red-700" role="alert" data-auth-intro>
+        <div className="mt-6 rounded-[4px] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger-text)]" role="alert" data-auth-intro>
           {error}
         </div>
       )}

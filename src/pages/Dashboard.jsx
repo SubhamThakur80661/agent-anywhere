@@ -471,7 +471,7 @@ function Dashboard() {
                     key={topic.name}
                     type="button"
                     onClick={() => setTrendingPopup({ open: true, topic: topic.name, category: topic.name })}
-                    className="rounded-[4px] border-[1.5px] border-[var(--border)] bg-[var(--bg-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] transition-all duration-150 hover:-translate-y-px hover:border-[var(--text)] hover:bg-[var(--signal)] hover:text-[var(--signal-ink)]"
+                    className="rounded-[4px] border-[1.5px] border-[var(--border)] bg-[var(--bg-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] transition duration-150 hover:-translate-y-px hover:border-[var(--text)] hover:bg-[var(--signal)] hover:text-[var(--signal-ink)]"
                   >
                     {topic.name}
                   </button>

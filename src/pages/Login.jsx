@@ -264,7 +264,7 @@ function Login() {
       </div>
 
       {error && (
-        <div className="mt-6 rounded-[4px] border border-red-300 bg-red-50 p-3 text-sm text-red-700" role="alert" data-auth-intro>
+        <div className="mt-6 rounded-[4px] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-3 text-sm text-[var(--danger-text)]" role="alert" data-auth-intro>
           {error}
         </div>
       )}
@@ -273,7 +273,7 @@ function Login() {
         <button
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="flex w-full items-center justify-center gap-3 rounded-[4px] border-[1.5px] border-[var(--border)] bg-[var(--surface)] py-3 font-medium text-[var(--text)] transition-all duration-200 hover:-translate-y-px hover:border-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--text)] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-3 rounded-[4px] border-[1.5px] border-[var(--border)] bg-[var(--surface)] py-3 font-medium text-[var(--text)] transition duration-200 hover:-translate-y-px hover:border-[var(--text)] focus:outline-none focus:ring-2 focus:ring-[var(--text)] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <div className="h-5 w-5 flex-shrink-0">
             <svg viewBox="0 0 24 24" className="h-full w-full" aria-hidden="true">

@@ -37,7 +37,7 @@ function Reveal({ children, className = "", delay = 0, y = 28, scroll = false })
 // after another. Pass lines as an array of strings; `accent` is the index of
 // the line drawn in the accent color (`accentClass` picks the tone: the
 // bright signal for ink panels, the deep lime for paper).
-function Lines({ lines, className = "", lineClassName = "", accent = -1, accentClass = "aa-line-accent", delay = 0.1, stagger = 0.09 }) {
+function Lines({ lines, className = "", accent = -1, accentClass = "aa-line-accent", delay = 0.1, stagger = 0.09 }) {
   const ref = useRef(null);
 
   useLayoutEffect(() => {
@@ -58,7 +58,7 @@ function Lines({ lines, className = "", lineClassName = "", accent = -1, accentC
       {lines.map((line, i) => (
         <span key={i} className="aa-line-mask">
           <span
-            className={`aa-line-inner ${lineClassName} ${i === accent ? accentClass : ""}`}
+            className={`aa-line-inner ${i === accent ? accentClass : ""}`}
           >
             {line}
           </span>

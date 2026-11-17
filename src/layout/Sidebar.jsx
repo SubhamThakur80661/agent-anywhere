@@ -94,7 +94,7 @@ function Sidebar() {
   return (
     <>
       <aside className="app-sidebar fixed left-0 top-0 z-20 hidden h-full w-[76px] flex-col border-r border-[var(--border)] md:flex">
-        <div className="flex h-16 items-center justify-center border-b border-white/10">
+        <div className="flex h-16 items-center justify-center border-b border-[var(--line-on-ink)]">
           <Link to="/dashboard" aria-label="Agent Anywhere home" className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-[var(--signal)] transition-transform duration-200 hover:-translate-y-0.5">
             <span className="font-display text-sm font-bold text-[var(--signal-ink)]">AA</span>
           </Link>
@@ -111,10 +111,10 @@ function Sidebar() {
                     title={item.label}
                     aria-label={item.label}
                     className={clsx(
-                      "flex h-11 w-11 items-center justify-center rounded-[4px] transition-all duration-150",
+                      "flex h-11 w-11 items-center justify-center rounded-[4px] transition duration-150",
                       active
                         ? "nav-active"
-                        : "text-[var(--ink-field-muted)] hover:bg-white/10 hover:text-[var(--ink-field-text)]"
+                        : "text-[var(--ink-field-muted)] hover:bg-[var(--hover-on-ink)] hover:text-[var(--ink-field-text)]"
                     )}
                     aria-current={active ? "page" : undefined}
                   >
@@ -126,7 +126,7 @@ function Sidebar() {
           </ul>
         </nav>
 
-        <div className="flex flex-col items-center gap-3 border-t border-white/10 py-4">
+        <div className="flex flex-col items-center gap-3 border-t border-[var(--line-on-ink)] py-4">
           <ThemeToggle />
           <UserMenu compact direction="up" align="left" tone="ink" />
         </div>

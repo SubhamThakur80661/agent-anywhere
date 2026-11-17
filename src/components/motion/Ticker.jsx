@@ -1,12 +1,12 @@
 // Idle motion: a slow marquee strip. Pure CSS transform animation, paused
 // under reduced motion (the row then sits still and stays readable).
-function Ticker({ items, className = "", separator = "//" }) {
+function Ticker({ items, className = "" }) {
   const row = (ariaHidden) => (
     <span className="aa-ticker-row" aria-hidden={ariaHidden || undefined}>
       {items.map((item, i) => (
         <span key={i} className="aa-ticker-item">
           <span>{item}</span>
-          <span className="aa-ticker-sep">{separator}</span>
+          <span className="aa-ticker-sep">//</span>
         </span>
       ))}
     </span>
