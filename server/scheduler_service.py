@@ -87,6 +87,19 @@ class SchedulerService:
         caption = post.get("caption", "")
         image_path = post.get("image_path")
         subreddit = post.get("subreddit", "test")
+
+        # Guests can never schedule posts through the API, but if one ever
+        # ended up scheduled, never let the scheduler publish it to a real
+        # platform. Mark it failed instead so it does not retry forever.
+        if user_id:
+            try:
+                from auth_service import auth_service
+                if await auth_service.is_guest_user_id(str(user_id)):
+                    logger.warning(f"Skipping scheduled post {post_id}: guest posts are never published")
+                    await self._mark_post_failed(post_id, "Guest posts are never published to real platforms")
+                    return
+            except Exception as e:
+                logger.warning(f"Could not check guest status for post {post_id}: {e}")
         
         logger.info(f"Publishing scheduled post {post_id} to platforms: {platforms}")
         logger.info(f"Caption: {caption[:100]}...")

@@ -4,6 +4,7 @@ Handles user authentication, session management, and user data operations
 """
 
 import os
+import secrets
 import uuid
 import jwt
 from datetime import datetime, timedelta
@@ -13,7 +14,14 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 from passlib.context import CryptContext
 from database import db_manager
-from models import User, UserResponse
+from models import User, UserResponse, GUEST_EMAIL, GUEST_NAME
+
+
+# Returned whenever a guest tries something guests are not allowed to do.
+GUEST_FORBIDDEN_MESSAGE = (
+    "Guest accounts can't connect accounts or publish posts. "
+    "Create a free account to do that."
+)
 
 
 class AuthService:
@@ -332,16 +340,118 @@ class AuthService:
         try:
             payload = self.verify_jwt_token(token)
             user_id = payload.get("user_id")
-            
+
             if user_id:
                 return await self.get_user_by_id(user_id)
             return None
-            
+
         except HTTPException:
             return None
         except Exception as e:
             print(f"Error getting user by token: {e}")
             return None
+
+    # ============================================
+    # GUEST (DEMO) ACCOUNT
+    # ============================================
+
+    @staticmethod
+    def is_guest_user(user) -> bool:
+        """True when the given user object or row is the shared guest account."""
+        if user is None:
+            return False
+        email = user.get("email") if isinstance(user, dict) else getattr(user, "email", None)
+        return email == GUEST_EMAIL
+
+    async def is_guest_user_id(self, user_id: str) -> bool:
+        """True when the user id belongs to the shared guest account."""
+        if not user_id:
+            return False
+        try:
+            row = self._row_to_dict(await db_manager.fetch_one(
+                "SELECT email FROM users WHERE id = :user_id",
+                {"user_id": user_id},
+            ))
+            return bool(row) and row.get("email") == GUEST_EMAIL
+        except Exception as e:
+            print(f"Error checking guest status for user {user_id}: {e}")
+            return False
+
+    @staticmethod
+    def require_non_guest(user) -> None:
+        """Raise 403 when the user is the shared guest account."""
+        if AuthService.is_guest_user(user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=GUEST_FORBIDDEN_MESSAGE,
+            )
+
+    async def reject_guest_token(self, authorization: Optional[str]) -> None:
+        """Raise 403 when an Authorization header carries a guest token.
+
+        Used by endpoints that predate per-user auth: when no token is sent,
+        or the token cannot be resolved, the request passes through unchanged
+        so existing behaviour is preserved.
+        """
+        if not authorization or not authorization.startswith("Bearer "):
+            return
+        user = await self.get_user_by_token(authorization.replace("Bearer ", "", 1))
+        self.require_non_guest(user)
+
+    async def get_or_create_guest_user(self) -> User:
+        """Get the shared guest user, creating it on first use.
+
+        The guest account is a real user row whose password is a random
+        secret that is hashed and never stored or returned, so the account
+        can never be signed into through the normal email/password login.
+        Only POST /auth/guest issues tokens for it.
+        """
+        existing = self._row_to_dict(await db_manager.fetch_one(
+            "SELECT * FROM users WHERE email = :email",
+            {"email": GUEST_EMAIL},
+        ))
+        if existing:
+            return User(
+                id=existing["id"],
+                google_id=existing.get("google_id"),
+                email=existing["email"],
+                name=existing["name"],
+                picture_url=existing.get("picture_url"),
+                is_active=existing["is_active"],
+                created_at=existing["created_at"],
+                updated_at=existing["updated_at"],
+            )
+
+        user_id = str(uuid.uuid4())
+        password_hash = self.hash_password(secrets.token_urlsafe(32))
+        insert_query = """
+            INSERT INTO users (id, email, name, password_hash, is_active)
+            VALUES (:id, :email, :name, :password_hash, :is_active)
+            RETURNING id, google_id, email, name, picture_url, is_active, created_at, updated_at
+        """
+        new_user = self._row_to_dict(await db_manager.fetch_one(insert_query, {
+            "id": user_id,
+            "email": GUEST_EMAIL,
+            "name": GUEST_NAME,
+            "password_hash": password_hash,
+            "is_active": True,
+        }))
+        if not new_user:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to create guest user",
+            )
+        print(f"Created shared guest user with id={user_id}")
+        return User(
+            id=new_user["id"],
+            google_id=new_user.get("google_id"),
+            email=new_user["email"],
+            name=new_user["name"],
+            picture_url=new_user.get("picture_url"),
+            is_active=new_user["is_active"],
+            created_at=new_user["created_at"],
+            updated_at=new_user["updated_at"],
+        )
     
     def hash_password(self, password: str) -> str:
         """Hash a password using Argon2 (or bcrypt fallback)."""

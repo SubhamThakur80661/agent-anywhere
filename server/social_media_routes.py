@@ -441,20 +441,25 @@ async def connect_platform(
     if platform not in ["facebook", "instagram", "twitter", "reddit", "linkedin"]:
         raise HTTPException(status_code=400, detail=f"Unsupported platform: {platform}")
 
+    from auth_service import auth_service
+
     try:
         # Try to get user_id from authorization header (if authenticated)
         user_id = None
+        current_user = None
         try:
-            from auth_service import auth_service
             if authorization and authorization.startswith("Bearer "):
                 token = authorization.replace("Bearer ", "")
                 current_user = await auth_service.get_current_user(token)
                 user_id = str(current_user.id) if current_user else None
         except:
             pass  # If auth fails, continue without user_id
-        
+
         if not user_id:
             raise HTTPException(status_code=401, detail="User not authenticated. Please sign in again before connecting a platform.")
+
+        # Guests can look around but cannot connect real social accounts
+        auth_service.require_non_guest(current_user)
         
         # Encode user_id in state parameter for OAuth callbacks
         import base64
@@ -675,14 +680,22 @@ async def connect_platform(
  
  
 @router.post("/{platform}/disconnect", response_model=ConnectionResponse)
-async def disconnect_platform(platform: str):
+async def disconnect_platform(platform: str, authorization: Optional[str] = Header(None)):
     """Disconnect from a social media platform by removing credentials"""
     if platform not in ["facebook", "instagram", "twitter", "reddit", "linkedin"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Unsupported platform: {platform}"
         )
-   
+
+    # Disconnecting removes stored credentials, so it needs a signed-in
+    # real user. Guests must not be able to wipe the owner's connections.
+    from auth_service import auth_service
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="User not authenticated. Please sign in again before disconnecting a platform.")
+    current_user = await auth_service.get_current_user(authorization.replace("Bearer ", "", 1))
+    auth_service.require_non_guest(current_user)
+
     try:
         # Get platform-specific environment keys
         keys_to_remove = env_manager.get_platform_env_keys(platform)
@@ -877,7 +890,10 @@ async def disconnect_account(
         token = authorization.replace("Bearer ", "")
         current_user = await auth_service.get_current_user(token)
         user_id = str(current_user.id)
-        
+
+        # Guests have no accounts of their own and must not touch this
+        auth_service.require_non_guest(current_user)
+
         # Verify the account belongs to the user and deactivate it
         from database import db_manager
         
@@ -1022,6 +1038,12 @@ async def facebook_callback(
         
         if not user_id:
             raise HTTPException(status_code=400, detail="Missing user identity in Facebook OAuth callback. Please retry the connection.")
+
+        # A guest must not be able to finish a connect flow, even with a
+        # hand-crafted state parameter
+        from auth_service import auth_service
+        if await auth_service.is_guest_user_id(user_id):
+            return _popup_error("Guest accounts can't connect social accounts. Sign in with a real account to connect Facebook.")
 
         # Short-lived token
         from urllib.parse import quote_plus
@@ -1298,7 +1320,13 @@ async def reddit_callback(code: Optional[str] = None, state: Optional[str] = Non
             except Exception as e:
                 print(f"⚠️ Failed to decode state: {e}")
                 # Continue with default user_id
-        
+
+        # A guest must not be able to finish a connect flow, even with a
+        # hand-crafted state parameter
+        from auth_service import auth_service
+        if user_id != "demo_user_123" and await auth_service.is_guest_user_id(user_id):
+            return _popup_error("Guest accounts can't connect social accounts. Sign in with a real account to connect Reddit.")
+
         from datetime import datetime, timedelta
         from database_service import db_service
         expires_at = datetime.now() + timedelta(seconds=expires_in) if expires_in else None
@@ -1445,7 +1473,13 @@ async def twitter_callback(
         
         if not code_verifier:
             raise HTTPException(status_code=400, detail="Code verifier not found in state")
-        
+
+        # A guest must not be able to finish a connect flow, even with a
+        # hand-crafted state parameter
+        from auth_service import auth_service
+        if user_id != "demo_user_123" and await auth_service.is_guest_user_id(user_id):
+            raise HTTPException(status_code=403, detail="Guest accounts can't connect social accounts. Sign in with a real account to connect Twitter.")
+
         # 1️⃣ Exchange code for tokens
         try:
             token_data = exchange_code_for_tokens(code, code_verifier)
@@ -1891,10 +1925,14 @@ async def select_facebook_page(payload: Dict[str, str]):
     user_id = payload.get("user_id")
     page_id = payload.get("page_id")
     page_access_token = payload.get("page_access_token")
- 
+
     if not user_id or not page_id or not page_access_token:
         raise HTTPException(status_code=400, detail="Missing user_id, page_id, or page_access_token")
- 
+
+    from auth_service import auth_service
+    if await auth_service.is_guest_user_id(user_id):
+        raise HTTPException(status_code=403, detail="Guest accounts can't connect accounts or publish posts. Create a free account to do that.")
+
     env_manager.save_facebook_page(user_id, page_id, page_access_token, expires_in=60*60*24*60)  # example 60 days
  
     # Test connection
@@ -1922,10 +1960,14 @@ async def select_reddit_account(payload: Dict[str, str]):
     user_id = payload.get("user_id")
     reddit_user_id = payload.get("reddit_user_id")
     reddit_username = payload.get("reddit_username")
-    
+
     if not user_id or not reddit_user_id or not reddit_username:
         raise HTTPException(status_code=400, detail="Missing user_id, reddit_user_id, or reddit_username")
-    
+
+    from auth_service import auth_service
+    if await auth_service.is_guest_user_id(user_id):
+        raise HTTPException(status_code=403, detail="Guest accounts can't connect accounts or publish posts. Create a free account to do that.")
+
     # Test connection
     test_result = await test_reddit_connection(user_id)
     
@@ -1959,10 +2001,14 @@ async def select_instagram_account(payload: Dict[str, str]):
     account_id = payload.get("account_id")
     access_token = payload.get("access_token")
     username = payload.get("username", "")
- 
+
     if not user_id or not account_id or not access_token:
         raise HTTPException(status_code=400, detail="Missing user_id, account_id, or access_token")
- 
+
+    from auth_service import auth_service
+    if await auth_service.is_guest_user_id(user_id):
+        raise HTTPException(status_code=403, detail="Guest accounts can't connect accounts or publish posts. Create a free account to do that.")
+
     try:
         # Verify the credentials by testing the Instagram Graph API
         verify_url = f"https://graph.facebook.com/v21.0/{account_id}"

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request as FastAPIRequest
+from fastapi import APIRouter, Depends, HTTPException, status, Request as FastAPIRequest, Header
 from fastapi.responses import RedirectResponse
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
@@ -17,6 +17,20 @@ import requests
 from PIL import Image
 
 router = APIRouter()
+
+
+async def _reject_guest(authorization: Optional[str] = None) -> None:
+    """Block guest users from actions on the owner's Google account.
+
+    These endpoints use one shared token file rather than per-user auth, so
+    the check only applies when the caller sends a Bearer token (the
+    frontend always does when signed in). Requests without a token keep
+    their existing behaviour.
+    """
+    if not authorization:
+        return
+    from auth_service import auth_service
+    await auth_service.reject_guest_token(authorization)
 
 # This is the file that will store the user's access and refresh tokens.
 # It is created automatically when the authorization flow completes for the first
@@ -308,8 +322,9 @@ async def get_google_status():
         return {"connected": False, "error": str(e)}
 
 @router.post("/google/disconnect")
-async def disconnect_google():
+async def disconnect_google(authorization: Optional[str] = Header(None)):
     """Remove token.json to fully disconnect Google account."""
+    await _reject_guest(authorization)
     try:
         if os.path.exists(TOKEN_FILE):
             if os.path.isdir(TOKEN_FILE):
@@ -433,7 +448,8 @@ class Campaign(BaseModel):
     activity: List[Activity]
 
 @router.post("/google-drive/save-campaign")
-async def save_campaign_to_drive(campaign: Campaign, drive_service = Depends(lambda: get_google_service('drive', 'v3'))):
+async def save_campaign_to_drive(campaign: Campaign, drive_service = Depends(lambda: get_google_service('drive', 'v3')), authorization: Optional[str] = Header(None)):
+    await _reject_guest(authorization)
     print("Saving campaign to drive...")
     try:
         image_file_id = None
@@ -593,7 +609,8 @@ async def save_campaign_to_drive(campaign: Campaign, drive_service = Depends(lam
         )
 
 @router.post("/google-calendar/create-event")
-async def create_calendar_event(campaign: Campaign, calendar_service = Depends(lambda: get_google_service('calendar', 'v3'))):
+async def create_calendar_event(campaign: Campaign, calendar_service = Depends(lambda: get_google_service('calendar', 'v3')), authorization: Optional[str] = Header(None)):
+    await _reject_guest(authorization)
     print("Creating calendar event...")
     if not campaign.scheduledAt:
         raise HTTPException(
@@ -661,7 +678,8 @@ class BatchCalendarRequest(BaseModel):
     campaigns: List[Campaign]
 
 @router.post("/google-calendar/create-batch-events")
-async def create_batch_calendar_events(request: BatchCalendarRequest, calendar_service = Depends(lambda: get_google_service('calendar', 'v3'))):
+async def create_batch_calendar_events(request: BatchCalendarRequest, calendar_service = Depends(lambda: get_google_service('calendar', 'v3')), authorization: Optional[str] = Header(None)):
+    await _reject_guest(authorization)
     print(f"Creating batch calendar events for {len(request.campaigns)} campaigns...")
     
     if not request.campaigns:

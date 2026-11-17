@@ -55,6 +55,19 @@ async def options_google():
             "Access-Control-Allow-Headers": "*",
         }
     )
+
+
+@router.options("/guest")
+async def options_guest():
+    """Handle CORS preflight for guest auth endpoint"""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+    )
 security = HTTPBearer()
 # Use the global instance from auth_service module instead of creating a new one
 
@@ -93,6 +106,7 @@ class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+    is_guest: bool = False
 
 
 @router.post("/register")
@@ -214,6 +228,36 @@ async def google_auth(request: GoogleTokenRequest):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Authentication failed: {str(e)}"
+        )
+
+
+@router.post("/guest", response_model=AuthResponse)
+async def guest_auth():
+    """
+    Sign in as the shared demo/guest user, no credentials needed.
+
+    Guests can look around and try content generation, but cannot connect
+    social accounts or publish to real platforms. The guest account has a
+    random password nobody knows, so it can only be reached through this
+    endpoint, never through the normal login.
+    """
+    try:
+        user = await auth_service.get_or_create_guest_user()
+        access_token = auth_service.create_access_token(user.id)
+
+        print("Guest login successful")
+        return AuthResponse(
+            access_token=access_token,
+            user=UserResponse.from_orm(user),
+            is_guest=True,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Guest login failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Guest login failed: {str(e)}"
         )
 
 
@@ -407,8 +451,9 @@ async def get_wallet_link_nonce(
     try:
         # Verify user is authenticated
         user = await auth_service.get_current_user(credentials.credentials)
+        auth_service.require_non_guest(user)
         wallet_address = request.wallet_address
-        
+
         # Generate nonce for linking
         nonce = secrets.token_hex(16)
         timestamp = int(time.time())
@@ -446,8 +491,9 @@ async def link_wallet_to_account(
     try:
         # Verify user is authenticated
         user = await auth_service.get_current_user(credentials.credentials)
+        auth_service.require_non_guest(user)
         wallet_address = request.wallet_address
-        
+
         # Check stored nonce
         stored = wallet_nonces.get(f"link_{wallet_address}")
         if not stored or stored["nonce"] != request.nonce:
@@ -522,6 +568,8 @@ async def delete_account(credentials: HTTPAuthorizationCredentials = Depends(sec
         
         # Get current user
         user = await auth_service.get_current_user(credentials.credentials)
+        # Guests must not be able to delete the shared guest account
+        auth_service.require_non_guest(user)
         print(f"✅ User found for deletion: {user.email}")
         
         # Delete user and all associated data
@@ -545,3 +593,12 @@ async def delete_account(credentials: HTTPAuthorizationCredentials = Depends(sec
 async def get_current_user_dependency(credentials: HTTPAuthorizationCredentials = Depends(security)):
     """Dependency to get current user for protected routes"""
     return await auth_service.get_current_user(credentials.credentials)
+
+
+# Dependency for routes guests must not use (connecting accounts, publishing,
+# scheduling). Real users pass through unchanged; guests get a 403.
+async def get_non_guest_user_dependency(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Dependency to get current user, rejecting the shared guest account"""
+    user = await auth_service.get_current_user(credentials.credentials)
+    auth_service.require_non_guest(user)
+    return user

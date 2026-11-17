@@ -11,6 +11,13 @@ from sqlalchemy.sql import func
 from database import Base
 
 
+# Shared demo/guest account. Guests sign in through POST /auth/guest only.
+# The account's password is a random secret nobody knows, so it can never be
+# used with the normal email/password login.
+GUEST_EMAIL = "guest@agent-anywhere.demo"
+GUEST_NAME = "Guest"
+
+
 class User(Base):
     """User model for authentication"""
     __tablename__ = "users"
@@ -231,6 +238,7 @@ class UserResponse(BaseModel):
     picture_url: Optional[str] = None
     wallet_address: Optional[str] = None  # Solana wallet address
     is_active: bool
+    is_guest: bool = False
     created_at: datetime
     updated_at: datetime
     
@@ -248,6 +256,7 @@ class UserResponse(BaseModel):
             picture_url=obj.picture_url,
             wallet_address=getattr(obj, 'wallet_address', None),
             is_active=obj.is_active,
+            is_guest=(obj.email == GUEST_EMAIL),
             created_at=obj.created_at,
             updated_at=obj.updated_at
         )

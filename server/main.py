@@ -380,7 +380,7 @@ main_app.include_router(chat_router)
 app.include_router(chat_router)  # Also include on root for direct /chat/* access
 
 # Import auth dependency after router is included
-from auth_routes import get_current_user_dependency
+from auth_routes import get_current_user_dependency, get_non_guest_user_dependency
 from auth_service import auth_service
 
 # Lifespan events are now handled in the lifespan context manager above
@@ -2036,7 +2036,7 @@ async def get_recent_posts(limit: int = 10, current_user = Depends(get_current_u
         return {"success": False, "error": str(e)}
 
 @main_app.put("/api/posts/{post_id}/schedule")
-async def schedule_post(post_id: str, schedule_data: dict, current_user = Depends(get_current_user_dependency)):
+async def schedule_post(post_id: str, schedule_data: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Schedule an existing post and create calendar event"""
     try:
         # Parse scheduled_at
@@ -2515,7 +2515,7 @@ async def generate_schedule_dates(request: GenerateScheduleRequest):
 
 
 @main_app.post("/api/batch/{batch_id}/schedule")
-async def schedule_batch_posts(batch_id: str, request: ScheduleBatchRequest, current_user = Depends(get_current_user_dependency)):
+async def schedule_batch_posts(batch_id: str, request: ScheduleBatchRequest, current_user = Depends(get_non_guest_user_dependency)):
     """Schedule all posts in a batch"""
     try:
         # Generate schedule times based on number of posts and days
@@ -3342,7 +3342,7 @@ async def get_facebook_page_info(
 async def post_to_facebook_endpoint(
     request: dict,
     account_id: Optional[str] = None,
-    current_user = Depends(get_current_user_dependency)
+    current_user = Depends(get_non_guest_user_dependency)
 ):
     """Post content to Facebook"""
     try:
@@ -3486,7 +3486,7 @@ async def get_reddit_status():
 
 
 @main_app.post("/api/reddit/post")
-async def post_to_reddit(request: dict):
+async def post_to_reddit(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Post content to Reddit"""
     try:
         title = request.get("title", "")
@@ -3504,7 +3504,7 @@ async def post_to_reddit(request: dict):
 
 
 @main_app.post("/api/reddit/schedule")
-async def schedule_reddit_post(request: dict):
+async def schedule_reddit_post(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Schedule a Reddit post"""
     try:
         title = request.get("title", "")
@@ -3533,7 +3533,7 @@ async def get_scheduled_reddit_posts():
 
 
 @main_app.post("/api/reddit/publish/{post_id}")
-async def publish_scheduled_reddit_post(post_id: str):
+async def publish_scheduled_reddit_post(post_id: str, current_user = Depends(get_non_guest_user_dependency)):
     """Publish a scheduled Reddit post"""
     try:
         result = reddit_service.publish_scheduled_post(post_id)
@@ -3706,7 +3706,7 @@ async def get_linkedin_status():
 
 
 @main_app.post("/api/linkedin/post")
-async def post_to_linkedin(request: dict):
+async def post_to_linkedin(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Post content to LinkedIn"""
     try:
         from linkedin_service import linkedin_service
@@ -3723,7 +3723,7 @@ async def post_to_linkedin(request: dict):
 
 
 @main_app.post("/api/linkedin/schedule")
-async def schedule_linkedin_post(request: dict):
+async def schedule_linkedin_post(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Schedule a LinkedIn post"""
     try:
         from database_service import db_service
@@ -4260,7 +4260,7 @@ async def get_twitter_status():
 
 
 @main_app.post("/api/twitter/post")
-async def post_to_twitter(request: dict):
+async def post_to_twitter(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Post content to Twitter"""
     try:
         from twitter_service import TwitterService
@@ -4280,7 +4280,7 @@ async def post_to_twitter(request: dict):
 
 
 @main_app.post("/api/twitter/schedule")
-async def schedule_twitter_post(request: dict):
+async def schedule_twitter_post(request: dict, current_user = Depends(get_non_guest_user_dependency)):
     """Schedule a Twitter post"""
     try:
         from database_service import db_service
@@ -4334,7 +4334,7 @@ async def get_scheduled_twitter_posts():
 
 
 @main_app.post("/api/twitter/publish/{post_id}")
-async def publish_scheduled_twitter_post(post_id: str):
+async def publish_scheduled_twitter_post(post_id: str, current_user = Depends(get_non_guest_user_dependency)):
     """Publish a scheduled Twitter post"""
     try:
         from twitter_service import TwitterService
