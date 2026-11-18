@@ -8,6 +8,8 @@ import { useCampaignStore } from "../store/campaignStore.js";
 import { useAuthStore } from "../store/authStore.js";
 import InstagramPostsPopup from "../components/InstagramPostsPopup.jsx";
 import TrendingTopicPopup from "../components/TrendingTopicPopup.jsx";
+import FacebookIcon from "../assets/social1/Facebook_icon.png";
+import InstagramIcon from "../assets/social1/Instagram_icon.png";
 
 // Stat component for the top stats row
 function Stat({ label, value, color = "text-blue-600" }) {
@@ -499,11 +501,11 @@ function Dashboard() {
               {/* Top-left platform connection badges */}
               <div className="absolute top-6 left-6 flex gap-3">
                 <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl px-4 py-2 border border-purple-100">
-                  <img src="/socialanywhere/icons/facebook.png" alt="Facebook" className="w-5 h-5" />
+                  <img src={FacebookIcon} alt="Facebook" className="w-5 h-5" />
                   <span className="text-xs text-gray-700">Facebook</span>
                 </div>
                 <div className="flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-xl px-4 py-2 border border-purple-100">
-                  <img src="/socialanywhere/icons/instagram.png" alt="Instagram" className="w-5 h-5" />
+                  <img src={InstagramIcon} alt="Instagram" className="w-5 h-5" />
                   <span className="text-xs text-gray-700">Instagram</span>
                 </div>
               </div>
@@ -516,7 +518,7 @@ function Dashboard() {
       {/* Welcome back section */}
       <div className="px-6 mb-6 flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Welcome back, {user?.name || 'kuruba ram'}</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Welcome back, {user?.name || 'Guest'}</h2>
           <p className="text-gray-600 mt-1">Here is what is happening with your campaigns today.</p>
         </div>
         <Link to="/create">

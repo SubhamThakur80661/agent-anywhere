@@ -283,19 +283,16 @@ function Sidebar() {
       {/* Header with Logo and Theme Toggle */}
       <div className="h-20 flex items-center justify-center px-6 py-4 relative">
         <div className="absolute inset-0 bg-gradient-primary opacity-20 rounded-t-3xl blur-sm text-black"></div>
-        <img
-          src="/socialanywhere/agent-anywhere-logo-light.png"
-          alt="Agent Anywhere"
-          className="h-25 max-h-25 w-auto mx-auto object-contain relative z-10 drop-shadow-lg text-black"
-          // className="h-2 w-auto relative z-10 drop-shadow-lg text-black" // ← updated h-8 for smaller logo
-        />
+        <div className="relative z-10 flex flex-col items-center leading-none select-none">
+          <span className="text-[34px] font-extrabold tracking-tight gradient-primary-text">ai</span>
+          <span className="mt-1 text-[13px] font-bold tracking-tight text-[var(--text)]">agentanywhere.ai</span>
+        </div>
       </div>
 
       {/* Social Media Agent Section (NO AA ICON, TEXT LEFT, TOGGLE RIGHT) */}
       <div className="h-20 flex items-center justify-between px-6 relative">
         <div className="flex flex-col">
-          <span className="font-extrabold text-lg gradient-primary-text">Social Media</span>
-          <span className="font-medium text-sm gradient-primary-text opacity-85">Agent</span>
+          <span className="font-extrabold text-lg gradient-primary-text">Socialanywhere</span>
         </div>
         <ThemeToggle />
       </div>
