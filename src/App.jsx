@@ -16,12 +16,10 @@ import Pricing from "./pages/Pricing.jsx";
 import HelpSupport from "./pages/HelpSupport.jsx";
 import Calendar from "./pages/Calendar.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
-import Cursor from "./components/motion/Cursor.jsx";
 
 function App() {
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] relative">
-      <Cursor />
       <ErrorBoundary>
         <Routes>
           {/* Public routes */}

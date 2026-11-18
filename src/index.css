@@ -7,7 +7,7 @@ html,
 body,
 #root {
   height: 100%;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 /* Shared utilities. Tokens live in styles/globals.css. */
@@ -88,26 +88,26 @@ body,
   outline: none;
 }
 
-/* Active sidebar nav item: signal field, ink text */
+/* Active sidebar nav item */
 .nav-active {
-  background: var(--signal);
-  color: var(--signal-ink);
+  background: var(--brand-50);
+  color: var(--brand-700);
 }
 
 [data-theme="dark"] .nav-active {
-  background: var(--signal);
-  color: var(--signal-ink);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--brand-300);
 }
 
-/* Guest mode banner: signal strip */
+/* Guest mode banner */
 .guest-banner {
-  border-color: var(--signal-ink);
-  background: var(--signal);
-  color: var(--signal-ink);
+  border-color: var(--brand-200);
+  background: var(--brand-50);
+  color: var(--brand-800);
 }
 
 [data-theme="dark"] .guest-banner {
-  border-color: var(--signal);
-  background: var(--signal);
-  color: var(--signal-ink);
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--brand-200);
 }

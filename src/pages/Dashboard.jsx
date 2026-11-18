@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Card from "../components/ui/Card.jsx";
 import Button from "../components/ui/Button.jsx";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,11 +7,16 @@ import { useCampaignStore } from "../store/campaignStore.js";
 import { useAuthStore } from "../store/authStore.js";
 import InstagramPostsPopup from "../components/InstagramPostsPopup.jsx";
 import TrendingTopicPopup from "../components/TrendingTopicPopup.jsx";
-import { Reveal, Lines } from "../components/motion/Reveal.jsx";
-import TiltCard from "../components/motion/TiltCard.jsx";
-import Magnetic from "../components/motion/Magnetic.jsx";
-import { ensureGsap, motionOK, EASE_OUT } from "../lib/motion.js";
-import { Plus, CalendarDays, PenLine, Lightbulb, BarChart3, FolderKanban, Settings as SettingsIcon, Image as ImageIcon, ArrowUpRight } from "lucide-react";
+import { Plus, CalendarDays, PenLine, Lightbulb, BarChart3, FolderKanban, Settings as SettingsIcon, Image as ImageIcon } from "lucide-react";
+
+function StatCard({ label, value }) {
+  return (
+    <Card className="p-5">
+      <div className="text-sm text-[var(--text-muted)] mb-1">{label}</div>
+      <div className="text-3xl font-semibold text-[var(--text)]">{value}</div>
+    </Card>
+  );
+}
 
 function timeAgo(timestamp) {
   const diff = Date.now() - timestamp;
@@ -22,12 +27,6 @@ function timeAgo(timestamp) {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.floor(hours / 24);
   return days === 1 ? "Yesterday" : `${days}d ago`;
-}
-
-function greetingForHour(hour) {
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
 }
 
 function Dashboard() {
@@ -42,7 +41,6 @@ function Dashboard() {
   const [calendarEvents, setCalendarEvents] = useState([]);
   const [showInstagramPopup, setShowInstagramPopup] = useState(false);
   const [trendingPopup, setTrendingPopup] = useState({ open: false, topic: null, category: null });
-  const weekRef = useRef(null);
 
   function getWeekDates(fromDate) {
     const d = new Date(fromDate);
@@ -226,24 +224,6 @@ function Dashboard() {
     return () => { mounted = false; };
   }, []);
 
-  // Signature moment: the seven day columns rise off the board one by one
-  // when the week panel scrolls into view. Transform only; no motion means
-  // the bars simply render at full height.
-  useLayoutEffect(() => {
-    if (!motionOK() || !weekRef.current) return;
-    const gsap = ensureGsap();
-    const ctx = gsap.context(() => {
-      gsap.from(".aa-week-bar", {
-        scaleY: 0,
-        duration: 1.1,
-        stagger: 0.07,
-        ease: EASE_OUT,
-        scrollTrigger: { trigger: weekRef.current, start: "top 88%" },
-      });
-    }, weekRef);
-    return () => ctx.revert();
-  }, []);
-
   const recent = useMemo(() => {
     if (recentActivity && recentActivity.length > 0) {
       return recentActivity.slice(0, 5).map((a) => ({
@@ -288,27 +268,6 @@ function Dashboard() {
   ];
 
   const maxWeekCount = Math.max(1, ...weekCounts);
-  const firstName = user?.name ? user.name.split(" ")[0] : "";
-  const headlineLines = firstName
-    ? [`${greetingForHour(new Date().getHours())},`, `${firstName}.`]
-    : [`${greetingForHour(new Date().getHours())}.`, "Here is the board."];
-  const todayLabel = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
-
-  const shortcuts = [
-    { to: "/create", icon: PenLine, label: "Write a post with the AI copywriter" },
-    { to: "/idea-generator", icon: Lightbulb, label: "Generate content ideas" },
-    { to: "/calendar", icon: CalendarDays, label: "See the posting calendar" },
-    { to: "/analytics", icon: BarChart3, label: "View analytics" },
-    { to: "/campaigns", icon: FolderKanban, label: "Manage campaigns" },
-    { to: "/settings", icon: SettingsIcon, label: "Connect platforms" },
-  ];
-
-  const ledgerStats = [
-    { label: "Total campaigns", value: stats.total },
-    { label: "Posts this week", value: stats.scheduledThisWeek },
-    { label: "Active posts", value: stats.active },
-    { label: "Total posts", value: stats.totalPosts },
-  ];
 
   return (
     <div className="space-y-6">
@@ -328,180 +287,135 @@ function Dashboard() {
         />
       )}
 
-      <div className="flex flex-wrap items-end justify-between gap-6 border-b-2 border-[var(--text)] pb-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="kicker text-[var(--text-muted)]">
-            Mission board <span className="mx-1 text-[var(--brand-600)]">/</span> {todayLabel}
-          </p>
-          <h1 className="display-2 mt-3">
-            <Lines lines={headlineLines} accent={1} accentClass="aa-line-accent-ink" delay={0.05} />
+          <h1 className="text-2xl font-semibold text-[var(--text)]">
+            Welcome back{user?.name ? `, ${user.name}` : ''}
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-[var(--text-muted)]">
-            Here is what is happening with your campaigns today.
-          </p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">Here is what is happening with your campaigns today.</p>
         </div>
-        <Reveal delay={0.3} y={16}>
-          <Magnetic>
-            <Button variant="primary" size="lg" onClick={() => navigate('/create')}>
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              New campaign
-            </Button>
-          </Magnetic>
-        </Reveal>
+        <Button variant="primary" onClick={() => navigate('/create')}>
+          <Plus className="w-4 h-4" aria-hidden="true" />
+          New campaign
+        </Button>
       </div>
 
-      <Reveal scroll>
-        <div className="grid grid-cols-2 overflow-hidden rounded-[6px] border border-[var(--border)] bg-[var(--surface)] lg:grid-cols-4">
-          {ledgerStats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={`px-5 py-5 ${i > 0 ? "border-l border-[var(--border)]" : ""} ${i >= 2 ? "border-t border-[var(--border)] lg:border-t-0" : ""} ${i === 2 ? "border-l-0 lg:border-l" : ""}`}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard label="Total campaigns" value={stats.total} />
+        <StatCard label="Posts this week" value={stats.scheduledThisWeek} />
+        <StatCard label="Active posts" value={stats.active} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-0 overflow-hidden">
+          <div className="flex items-center justify-between px-5 pt-5 pb-3">
+            <h2 className="font-semibold text-[var(--text)]">Recent activity</h2>
+            <button
+              type="button"
+              onClick={() => setShowInstagramPopup(true)}
+              className="inline-flex items-center gap-1.5 text-sm text-[var(--primary)] hover:underline"
             >
-              <div className="kicker text-[var(--text-muted)]">{stat.label}</div>
-              <div className="font-display mt-2 text-5xl font-bold tracking-tight text-[var(--text)]">
-                {stat.value}
-              </div>
+              <ImageIcon className="w-4 h-4" aria-hidden="true" />
+              Instagram posts
+            </button>
+          </div>
+          {recent.length === 0 ? (
+            <div className="px-5 pb-6">
+              <p className="text-sm text-[var(--text-muted)]">
+                Nothing here yet. Create your first campaign and it will show up here.
+              </p>
+              <Link to="/create" className="inline-block mt-3">
+                <Button variant="secondary" size="sm">Create a campaign</Button>
+              </Link>
             </div>
-          ))}
-        </div>
-      </Reveal>
-
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <Reveal scroll className="lg:col-span-7" delay={0.05}>
-          <Card className="h-full p-0">
-            <div ref={weekRef} className="p-5 sm:p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="kicker text-[var(--text-muted)]">This week</p>
-                  <h2 className="font-display mt-2 text-2xl font-bold tracking-tight text-[var(--text)]">
-                    Seven days, pinned.
-                  </h2>
-                  <p className="mt-1 text-sm text-[var(--text-muted)]">Posts scheduled for each of the next 7 days.</p>
-                </div>
-                <div className="shrink-0 text-right">
-                  <div className="font-display text-3xl font-bold tracking-tight text-[var(--text)]">
-                    {stats.scheduledThisWeek}
+          ) : (
+            <ul className="divide-y divide-[var(--border)]">
+              {recent.map((item, index) => (
+                <li key={index} className="flex items-start gap-3 px-5 py-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-[var(--text)] truncate">{item.text}</div>
+                    {item.subtitle && (
+                      <div className="text-xs text-[var(--text-muted)] truncate">{item.subtitle}</div>
+                    )}
                   </div>
-                  <div className="kicker text-[var(--text-muted)]">Pinned</div>
-                </div>
-              </div>
-              <div
-                className="mt-6 flex h-44 items-end gap-2 sm:gap-3"
-                role="img"
-                aria-label={`Scheduled posts per day: ${weekCounts.join(', ')}`}
-              >
-                {weekCounts.map((count, index) => {
-                  const isToday = index === 0;
-                  return (
-                    <div key={index} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
-                      <span className="font-mono text-xs font-semibold text-[var(--text-muted)]">
-                        {count > 0 ? count : ''}
-                      </span>
-                      <div
-                        className={`aa-week-bar w-full max-w-12 rounded-t-[2px] ${isToday ? "bg-[var(--signal)] ring-1 ring-[var(--text)]" : "bg-[var(--text)]"}`}
-                        style={{ height: `${Math.max(count > 0 ? 12 : 4, (count / maxWeekCount) * 100)}%`, opacity: count > 0 || isToday ? 1 : 0.2 }}
-                      />
-                      <span className={`font-mono text-[11px] ${isToday ? "font-semibold text-[var(--text)]" : "text-[var(--text-muted)]"}`}>
-                        {isToday ? "Today" : weekDates[index].toLocaleDateString(undefined, { weekday: 'short' })}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </Card>
-        </Reveal>
+                  <div className="text-xs text-[var(--text-light)] whitespace-nowrap">{timeAgo(item.time)}</div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
 
-        <Reveal scroll className="lg:col-span-5" delay={0.12}>
-          <TiltCard className="h-full" max={3}>
-            <Card className="h-full p-0">
-              <div className="flex items-center justify-between px-5 pb-3 pt-5">
-                <div>
-                  <p className="kicker text-[var(--text-muted)]">Ledger</p>
-                  <h2 className="font-display mt-1 text-xl font-bold tracking-tight text-[var(--text)]">Recent activity</h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowInstagramPopup(true)}
-                  className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-[var(--text)] underline decoration-[var(--signal)] decoration-2 underline-offset-4 hover:decoration-[var(--text)]"
-                >
-                  <ImageIcon className="h-4 w-4" aria-hidden="true" />
-                  Instagram posts
-                </button>
+        <Card className="p-5">
+          <h2 className="font-semibold text-[var(--text)] mb-1">This week</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-5">Posts scheduled for each of the next 7 days.</p>
+          <div className="flex items-end gap-3 h-28" role="img" aria-label={`Scheduled posts per day: ${weekCounts.join(', ')}`}>
+            {weekCounts.map((count, index) => (
+              <div key={index} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                <span className="text-xs font-medium text-[var(--text-muted)]">{count > 0 ? count : ''}</span>
+                <div
+                  className="w-full max-w-10 rounded-t-md bg-[var(--primary)]"
+                  style={{ height: `${Math.max(count > 0 ? 12 : 4, (count / maxWeekCount) * 100)}%`, opacity: count > 0 ? 1 : 0.25 }}
+                />
+                <span className="text-xs text-[var(--text-muted)]">
+                  {weekDates[index].toLocaleDateString(undefined, { weekday: 'short' })}
+                </span>
               </div>
-              {recent.length === 0 ? (
-                <div className="px-5 pb-6">
-                  <p className="text-sm text-[var(--text-muted)]">
-                    Nothing here yet. Create your first campaign and it will show up here.
-                  </p>
-                  <Link to="/create" className="mt-3 inline-block">
-                    <Button variant="secondary" size="sm">Create a campaign</Button>
-                  </Link>
-                </div>
-              ) : (
-                <ul className="divide-y divide-[var(--border)]">
-                  {recent.map((item, index) => (
-                    <li key={index} className="aa-ledger-row flex items-start gap-3 px-5 py-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium text-[var(--text)]">{item.text}</div>
-                        {item.subtitle && (
-                          <div className="truncate text-xs text-[var(--text-muted)]">{item.subtitle}</div>
-                        )}
-                      </div>
-                      <div className="whitespace-nowrap font-mono text-xs text-[var(--text-light)]">{timeAgo(item.time)}</div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </TiltCard>
-        </Reveal>
+            ))}
+          </div>
+          <div className="mt-5 pt-4 border-t border-[var(--border)] flex items-center justify-between text-sm">
+            <span className="text-[var(--text-muted)]">Total posts</span>
+            <span className="font-semibold text-[var(--text)]">{stats.totalPosts}</span>
+          </div>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <Reveal scroll className="lg:col-span-5" delay={0.05}>
-          <TiltCard className="h-full" max={3}>
-            <Card className="h-full p-5">
-              <p className="kicker text-[var(--text-muted)]">Worth a look</p>
-              <h2 className="font-display mt-1 text-xl font-bold tracking-tight text-[var(--text)]">Trending topics</h2>
-              <p className="mb-4 mt-1 text-sm text-[var(--text-muted)]">Pick one to see what people are posting about it.</p>
-              <div className="flex flex-wrap gap-2">
-                {trendingTopics.map((topic) => (
-                  <button
-                    key={topic.name}
-                    type="button"
-                    onClick={() => setTrendingPopup({ open: true, topic: topic.name, category: topic.name })}
-                    className="rounded-[4px] border-[1.5px] border-[var(--border)] bg-[var(--bg-muted)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] transition duration-150 hover:-translate-y-px hover:border-[var(--text)] hover:bg-[var(--signal)] hover:text-[var(--signal-ink)]"
-                  >
-                    {topic.name}
-                  </button>
-                ))}
-              </div>
-            </Card>
-          </TiltCard>
-        </Reveal>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-5">
+          <h2 className="font-semibold text-[var(--text)] mb-1">Trending topics</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-4">Pick one to see what people are posting about it.</p>
+          <div className="flex flex-wrap gap-2">
+            {trendingTopics.map((topic) => (
+              <button
+                key={topic.name}
+                type="button"
+                onClick={() => setTrendingPopup({ open: true, topic: topic.name, category: topic.name })}
+                className="px-3 py-1.5 rounded-full text-xs font-medium border border-[var(--border)] bg-[var(--bg-muted)] text-[var(--text)] hover:border-[var(--primary)] transition-colors"
+              >
+                {topic.name}
+              </button>
+            ))}
+          </div>
+        </Card>
 
-        <Reveal scroll className="lg:col-span-7" delay={0.12}>
-          <TiltCard className="h-full" max={3}>
-            <Card className="h-full p-5">
-              <p className="kicker text-[var(--text-muted)]">Go to</p>
-              <h2 className="font-display mb-2 mt-1 text-xl font-bold tracking-tight text-[var(--text)]">Shortcuts</h2>
-              <div className="divide-y divide-[var(--border)]">
-                {shortcuts.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className="aa-ledger-row group flex items-center gap-3 py-2.5"
-                  >
-                    <item.icon className="h-4 w-4 shrink-0 text-[var(--text-muted)]" aria-hidden="true" />
-                    <span className="flex-1 text-sm font-medium text-[var(--text)]">{item.label}</span>
-                    <ArrowUpRight className="h-4 w-4 text-[var(--text-light)] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[var(--text)]" aria-hidden="true" />
-                  </Link>
-                ))}
-              </div>
-            </Card>
-          </TiltCard>
-        </Reveal>
+        <Card className="p-5">
+          <h2 className="font-semibold text-[var(--text)] mb-4">Shortcuts</h2>
+          <div className="space-y-1">
+            <Link to="/create" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <PenLine className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">Write a post with the AI copywriter</span>
+            </Link>
+            <Link to="/idea-generator" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <Lightbulb className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">Generate content ideas</span>
+            </Link>
+            <Link to="/calendar" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <CalendarDays className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">See the posting calendar</span>
+            </Link>
+            <Link to="/analytics" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <BarChart3 className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">View analytics</span>
+            </Link>
+            <Link to="/campaigns" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <FolderKanban className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">Manage campaigns</span>
+            </Link>
+            <Link to="/settings" className="flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-[var(--bg-muted)] transition-colors">
+              <SettingsIcon className="w-4 h-4 text-[var(--text-muted)]" aria-hidden="true" />
+              <span className="text-sm text-[var(--text)]">Connect platforms</span>
+            </Link>
+          </div>
+        </Card>
       </div>
     </div>
   );
