@@ -318,4 +318,23 @@ img { display: block; max-width: 100%; height: auto; }
   border-color: var(--border) !important;
 }
 
+/* Dark mode: cards stay white (see .card above), so text inside them must
+   stay dark. Without this, the dark-theme remaps above make card text
+   light — invisible on the white card (user report 2026-11-18, proven by
+   a live contrast scan: light grey text on white, ratio 1.24). These
+   rules sit after the remaps and win on specificity + !important. */
+[data-theme="dark"] .card {
+  color: #0b1724;
+}
+[data-theme="dark"] .card .text-gray-900,
+[data-theme="dark"] .card .text-gray-800,
+[data-theme="dark"] .card .text-gray-700,
+[data-theme="dark"] .card .text-gray-600,
+[data-theme="dark"] .card .text-gray-500 {
+  color: #475569 !important;
+}
+[data-theme="dark"] .card .text-gray-400 {
+  color: #64748b !important;
+}
+
 /* End of globals.css */

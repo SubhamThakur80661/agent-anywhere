@@ -311,7 +311,7 @@ function Sidebar() {
                     "flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300 group",
                     isActive || pathname.startsWith(item.to)
                       ? "bg-gradient-primary text-black shadow-lg scale-105"
-                      : "text-black/90 hover:bg-white/10 hover:text-black hover:scale-102 backdrop-blur-sm"
+                      : "text-[var(--text)] hover:bg-white/10 hover:scale-102 backdrop-blur-sm"
                   )
                 }
               >
@@ -321,7 +321,7 @@ function Sidebar() {
                     "w-5 h-5 transition-colors duration-200",
                     pathname.startsWith(item.to)
                       ? "text-black"
-                      : "text-black/70 group-hover:text-black"
+                      : "opacity-70 group-hover:opacity-100"
                   )}
                 />
                 <span className="font-semibold">{item.label}</span>
