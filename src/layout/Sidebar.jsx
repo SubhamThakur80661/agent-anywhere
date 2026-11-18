@@ -282,12 +282,12 @@ function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 h-full w-[280px] glass-hover flex flex-col z-20 shadow-lg">
       {/* Header with Logo and Theme Toggle */}
-      <div className="h-20 flex items-center justify-center px-6 py-4 relative">
+      <div className="h-28 flex items-center justify-center px-6 py-4 relative">
         <div className="absolute inset-0 bg-gradient-primary opacity-20 rounded-t-3xl blur-sm text-black"></div>
         <img
           src={AgentAnywhereLogo}
           alt="Agent Anywhere"
-          className="h-[74px] w-auto mx-auto object-contain relative z-10 drop-shadow-lg"
+          className="h-20 w-auto mx-auto object-contain relative z-10 drop-shadow-lg"
         />
       </div>
 
