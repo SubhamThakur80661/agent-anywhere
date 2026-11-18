@@ -85,12 +85,16 @@ main_app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files directory
-main_app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+# Mount static files directory (only when the build output exists — the
+# backend also runs standalone, e.g. on Render, where no frontend is bundled)
+if os.path.isdir("static/assets"):
+    main_app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
 # Mount frontend static files
-main_app.mount("/static", StaticFiles(directory="static"), name="static")
+if os.path.isdir("static"):
+    main_app.mount("/static", StaticFiles(directory="static"), name="static")
 # Mount public directory for uploaded and generated images (same as AI-generated images)
-main_app.mount("/public", StaticFiles(directory="public"), name="public")
+if os.path.isdir("public"):
+    main_app.mount("/public", StaticFiles(directory="public"), name="public")
 
 # Create root app and mount main app at /socialanywhere
 app = FastAPI(lifespan=lifespan)
@@ -4514,9 +4518,11 @@ async def api_info():
         ],
     }
 
-# Mount static files for direct asset access
-main_app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
-main_app.mount("/icons", StaticFiles(directory="static/icons"), name="icons")
+# Mount static files for direct asset access (only when the build output exists)
+if os.path.isdir("static/assets"):
+    main_app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+if os.path.isdir("static/icons"):
+    main_app.mount("/icons", StaticFiles(directory="static/icons"), name="icons")
 
 # Serve privacy policy directly
 @main_app.get("/privacy-policy.html")

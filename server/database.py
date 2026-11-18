@@ -22,7 +22,13 @@ DATABASE_URL = os.getenv(
 )
 
 # For async operations
-database = Database(DATABASE_URL)
+# Neon (and other hosted Postgres) requires SSL, but the `databases`
+# library ignores `sslmode` in the URL — it only honors an `ssl` option.
+# The sync engine above keeps using the full URL (psycopg2 honors
+# sslmode), so pass ssl=True to the async client only when the URL asks
+# for SSL. Localhost databases keep working without SSL.
+_async_db_options = {"ssl": True} if "sslmode=require" in DATABASE_URL else {}
+database = Database(DATABASE_URL, **_async_db_options)
 
 # For sync operations with SQLAlchemy
 engine = create_engine(
