@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 
 function Register() {
   const navigate = useNavigate();
-  const { login: loginGoogle, isAuthenticated, isLoading, error, clearError, setUser, setToken, setLoading, setError } = useAuthStore();
+  const { login: loginGoogle, isAuthenticated, isGuest, isLoading, error, clearError, setUser, setToken, setLoading, setError } = useAuthStore();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,9 +21,9 @@ function Register() {
     agreeToTerms: false,
   });
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (guests stay: they may register for real)
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isGuest) {
       // Check platform connections and redirect accordingly
       const checkAndRedirect = async () => {
         try {
@@ -41,7 +41,7 @@ function Register() {
       
       checkAndRedirect();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, isGuest, navigate]);
 
   // Clear errors when component mounts
   useEffect(() => {

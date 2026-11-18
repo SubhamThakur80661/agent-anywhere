@@ -276,7 +276,7 @@ async def redirect_socialanywhere(request: Request):
     print(f"🔀 Redirecting /socialanywhere to: {redirect_url}")
     return RedirectResponse(url=redirect_url, status_code=301)
 
-app.mount("/socialanywhere", main_app)
+
 
 # Serve privacy policy at root level (for direct domain access)
 @app.get("/privacy-policy.html")
@@ -4582,3 +4582,11 @@ async def serve_frontend(path: str = "", request: Request = None):
         return FileResponse("static/index.html")
     else:
         raise HTTPException(status_code=404, detail="Frontend not found")
+
+
+# Mount the main API app at root LAST, so every /api/*, /generate-* and
+# router path is served at the root paths the frontend calls. (It used to be
+# mounted at /socialanywhere only, which 404'd all of them.) This must stay
+# after all route registrations on `app` so /, /health, /auth/* and /chat/*
+# keep matching first.
+app.mount("/", main_app)

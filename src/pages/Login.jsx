@@ -21,9 +21,9 @@ function Login() {
     password: '',
   });
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (guests stay: they may log in for real)
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !isGuest) {
       // Check platform connections and redirect accordingly
       const checkAndRedirect = async () => {
         // Guests have no connections by design; send them straight to the dashboard
