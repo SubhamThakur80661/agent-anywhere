@@ -202,6 +202,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import ThemeToggle from "../components/ThemeToggle.jsx";
 import UserMenu from "../components/UserMenu.jsx";
+import AgentAnywhereLogo from "../assets/agent-anywhere-logo-light.png";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: "home" },
@@ -283,10 +284,11 @@ function Sidebar() {
       {/* Header with Logo and Theme Toggle */}
       <div className="h-20 flex items-center justify-center px-6 py-4 relative">
         <div className="absolute inset-0 bg-gradient-primary opacity-20 rounded-t-3xl blur-sm text-black"></div>
-        <div className="relative z-10 flex flex-col items-center leading-none select-none">
-          <span className="text-[34px] font-extrabold tracking-tight gradient-primary-text">ai</span>
-          <span className="mt-1 text-[13px] font-bold tracking-tight text-[var(--text)]">agentanywhere.ai</span>
-        </div>
+        <img
+          src={AgentAnywhereLogo}
+          alt="Agent Anywhere"
+          className="h-[74px] w-auto mx-auto object-contain relative z-10 drop-shadow-lg"
+        />
       </div>
 
       {/* Social Media Agent Section (NO AA ICON, TEXT LEFT, TOGGLE RIGHT) */}
