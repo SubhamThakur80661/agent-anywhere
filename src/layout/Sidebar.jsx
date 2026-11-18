@@ -287,7 +287,8 @@ function Sidebar() {
         <img
           src={AgentAnywhereLogo}
           alt="Agent Anywhere"
-          className="h-20 w-auto mx-auto object-contain relative z-10 drop-shadow-lg"
+          style={{ height: '80px', width: 'auto', maxWidth: '100%' }}
+          className="mx-auto object-contain relative z-10 drop-shadow-lg"
         />
       </div>
 
