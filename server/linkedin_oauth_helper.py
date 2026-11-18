@@ -38,7 +38,7 @@ def _get_linkedin_redirect_uri():
         port = os.getenv("PORT", "8000")
         domain_with_port = f"{public_domain}:{port}"
     
-    return f"{scheme}://{domain_with_port}/socialanywhere/social-media/linkedin/callback"
+    return f"{scheme}://{domain_with_port}/social-media/linkedin/callback"
 
 LINKEDIN_REDIRECT_URI = _get_linkedin_redirect_uri()
 

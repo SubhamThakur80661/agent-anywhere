@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { apiFetch, apiUrl } from "../lib/api.js";
 import apiClient from "../lib/apiClient.js";
 import SocialMediaConnectionModal from "../components/ui/SocialMediaConnectionModal.jsx";
-import { Facebook, Twitter, MessageCircle, Instagram, HardDrive, CalendarDays } from "lucide-react";
+import { Facebook, Twitter, MessageCircle, Instagram, HardDrive, CalendarDays, Linkedin } from "lucide-react";
 import { useAuthStore } from "../store/authStore";
 import GoogleCalendarIntegration from "../components/GoogleCalendarIntegration.jsx";
 import EventCalendarModal from "../components/EventCalendarModal.jsx";
@@ -112,7 +112,8 @@ function Settings() {
     facebook: { connected: false, checking: false, accounts: [] },
     instagram: { connected: false, checking: false, accounts: [] },
     twitter: { connected: false, checking: false, accounts: [] },
-    reddit: { connected: false, checking: false, accounts: [] }
+    reddit: { connected: false, checking: false, accounts: [] },
+    linkedin: { connected: false, checking: false, accounts: [] }
   });
 
   // Handler to save Instagram static credentials
@@ -434,7 +435,7 @@ function Settings() {
 
   // Social media platform management functions
   const checkAllSocialMediaStatus = async () => {
-    const platforms = ['facebook', 'instagram', 'twitter', 'reddit'];
+    const platforms = ['facebook', 'instagram', 'twitter', 'reddit', 'linkedin'];
 
     for (const platform of platforms) {
       setPlatformStatus(prev => ({ ...prev, [platform]: { ...prev[platform], checking: true } }));
@@ -719,6 +720,12 @@ function Settings() {
         icon: MessageCircle,
         color: 'bg-orange-600',
         description: 'Connect your Reddit account to post to subreddits automatically'
+      },
+      linkedin: {
+        name: 'LinkedIn',
+        icon: Linkedin,
+        color: 'bg-[#0A66C2]',
+        description: 'Connect your LinkedIn account to post content automatically'
       }
     };
     return configs[platform];
@@ -732,7 +739,7 @@ function Settings() {
       <div className="space-y-4">
         <h2 className="text-lg font-medium text-gray-900">Social Media Connections</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {['facebook', 'instagram', 'twitter', 'reddit'].map((platform) => {
+          {['facebook', 'instagram', 'twitter', 'reddit', 'linkedin'].map((platform) => {
             const cfg = getSocialMediaPlatformConfig(platform);
             const st = platformStatus[platform];
             const Icon = cfg.icon;
@@ -743,6 +750,7 @@ function Settings() {
               instagram: { users: '2.4B+ users', note: 'Visual content', handle: '@yourbrand' },
               twitter: { users: '550M+ users', note: 'Real-time updates', handle: '@yourhandle' },
               reddit: { users: '430M+ users', note: 'Community driven', handle: 'r/yourcommunity' },
+              linkedin: { users: '1B+ users', note: 'Professional network', handle: 'in/yourprofile' },
             }[platform];
 
             const platformBg = {
@@ -750,6 +758,7 @@ function Settings() {
               instagram: 'https://images.unsplash.com/photo-1759912255512-c5e56b4e5e82?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpbnN0YWdyYW0lMjBhcHAlMjBpbnRlcmZhY2V8ZW58MXx8fHwxNzYxNzI0NjQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
               twitter: 'https://images.unsplash.com/photo-1743582733049-dcb16521f6fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0d2l0dGVyJTIwc29jaWFsJTIwbWVkaWF8ZW58MXx8fHwxNzYxNzI0NjQ4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
               reddit: 'https://images.unsplash.com/photo-1734004691776-d7f04732c174?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzb2NpYWwlMjBtZWRpYSUyMHdvcmtzcGFjZSUyMG1vZGVybnxlbnwxfHx8fDE3NjE3MjQ2NDd8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
+              linkedin: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1080&auto=format&fit=crop',
             }[platform];
 
             return (

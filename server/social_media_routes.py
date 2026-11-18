@@ -98,7 +98,7 @@ if not FACEBOOK_REDIRECT_URI:
     else:
         port = os.getenv("PORT", "8000")
         domain_with_port = f"{public_domain}:{port}"
-    FACEBOOK_REDIRECT_URI = f"{scheme}://{domain_with_port}/socialanywhere/social-media/facebook/callback"
+    FACEBOOK_REDIRECT_URI = f"{scheme}://{domain_with_port}/social-media/facebook/callback"
 
 # Redirect URI for Instagram Business Login with Instagram Login
 INSTAGRAM_REDIRECT_URI = os.getenv("INSTAGRAM_REDIRECT_URI")
@@ -110,7 +110,7 @@ if not INSTAGRAM_REDIRECT_URI:
     else:
         port = os.getenv("PORT", "8000")
         domain_with_port = f"{public_domain}:{port}"
-    INSTAGRAM_REDIRECT_URI = f"{scheme}://{domain_with_port}/socialanywhere/social-media/instagram/callback"
+    INSTAGRAM_REDIRECT_URI = f"{scheme}://{domain_with_port}/social-media/instagram/callback"
  
 # Platform connection testers
 async def test_facebook_connection(user_id: Optional[str] = None) -> Dict[str, Any]:
@@ -554,6 +554,9 @@ async def connect_platform(
         
         # ----- LINKEDIN FLOW -----
         if platform == "linkedin":
+            from linkedin_oauth_helper import LINKEDIN_CLIENT_ID
+            if not LINKEDIN_CLIENT_ID:
+                raise HTTPException(status_code=400, detail="LinkedIn Client ID must be configured in environment variables")
             # Generate random state for CSRF protection
             state = secrets.token_urlsafe(32)
             auth_url = get_linkedin_auth_url(state)
