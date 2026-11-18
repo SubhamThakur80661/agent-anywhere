@@ -6,11 +6,10 @@ import Button from "../components/ui/Button.jsx";
 import Badge from "../components/ui/Badge.jsx";
 import Modal from "../components/ui/Modal.jsx";
 import { useCampaignStore } from "../store/campaignStore.js";
-import { useAuthStore } from "../store/authStore.js";
 import { toast } from "sonner";
+import { useAuthStore } from "../store/authStore.js";
 import ProgressBar from "../components/ui/ProgressBar.jsx";
 import { format } from "date-fns";
-import { Flame, Target, Image as ImageIcon } from "lucide-react";
 import apiClient from "../lib/apiClient.js";
 import { apiUrl, apiFetch } from "../lib/api.js";
 
@@ -46,7 +45,6 @@ function Progress({ current = 0 }) {
 
 function CreateCampaign() {
   const navigate = useNavigate();
-  const isGuest = useAuthStore((state) => state.isGuest);
 
   const location = useLocation();
   const [campaignName, setCampaignName] = useState("");
@@ -103,6 +101,8 @@ function CreateCampaign() {
       [captionIndex]: assetType
     }));
   };
+
+  const isGuest = useAuthStore((state) => state.isGuest);
 
   const handleImageUpload = (captionIndex, file) => {
     if (file && file.type.startsWith('image/')) {
@@ -261,7 +261,7 @@ function CreateCampaign() {
         if (!days) setDays("7");
         if (!numPosts) setNumPosts("5");
 
-        toast.success(`Creating content for trending topic: ${trendingTopic}`);
+        toast.success(`🔥 Creating content for trending topic: ${trendingTopic}`);
 
         // Clear the state to prevent re-triggering on re-renders
         window.history.replaceState({}, document.title);
@@ -306,7 +306,7 @@ function CreateCampaign() {
           }
 
           // Show success message
-          toast.success(`Campaign details loaded from "${data.campaign_name}".`);
+          toast.success(`✨ Campaign details loaded from "${data.campaign_name}" idea!`);
 
           // Clear the localStorage to prevent re-triggering
           localStorage.removeItem('prefilledCampaignData');
@@ -558,9 +558,9 @@ function CreateCampaign() {
 
       // Show appropriate success/error message
       if (failureCount === 0) {
-        toast.success(`Created ${successCount} posts with images.`);
+        toast.success(`✅ Successfully created ${successCount} posts with images!`);
       } else if (successCount === 0) {
-        toast.error(`Could not generate images for ${failureCount} posts. Please try again or check your API settings.`);
+        toast.error(`❌ Failed to generate images for all ${failureCount} posts. Please try again or check your API settings.`);
       } else {
         toast.success(`⚠️ Created ${successCount} posts successfully, ${failureCount} failed. You can retry failed posts or proceed to scheduling.`);
       }
@@ -720,6 +720,10 @@ function CreateCampaign() {
   // Note: scheduleDates function removed - now using backend API via apiClient.generateScheduleDates()
 
   const handleContinueToSchedule = async () => {
+    if (isGuest) {
+      toast.error("Guest accounts can't schedule posts. Create a free account to do that.");
+      return;
+    }
     // Check if individual platforms are selected for all posts
     const allPostsHaveIndividualPlatforms = batchItems.every(item =>
       platformsByPost[item.id] && platformsByPost[item.id].length > 0
@@ -1275,25 +1279,44 @@ function CreateCampaign() {
     console.log('🎯 Rendering CreateCampaign component...');
 
     return (
-      <div className="space-y-6 max-w-6xl mx-auto">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-[var(--text)]">Create a campaign</h1>
-            <p className="text-sm text-[var(--text-muted)] mt-1 max-w-2xl">
-              Describe what you&apos;re posting about, pick your platforms, and let AI draft the captions and images.
-            </p>
-            <div className="flex flex-wrap gap-2 text-xs mt-3">
-              <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]">Mode: {mode === "easy" ? "Basic" : "Advanced"}</span>
-              <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]">Posts: {numPosts || 0}</span>
-              <span className="px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]">Platforms: {selectedPlatforms.length || 0}</span>
+      <div className="space-y-6 max-w-6xl mx-auto relative">
+        {/* Soft background accents */}
+        <div className="pointer-events-none absolute -left-24 top-10 w-72 h-72 rounded-full bg-gradient-to-br from-pink-300/30 via-purple-300/20 to-blue-300/20 blur-3xl -z-10"></div>
+        <div className="pointer-events-none absolute -right-16 -top-6 w-64 h-64 rounded-full bg-gradient-to-br from-purple-400/25 via-pink-300/20 to-rose-200/25 blur-3xl -z-10"></div>
+
+        {/* Hero header */}
+        <div className="relative overflow-hidden rounded-2xl p-6 md:p-8 content-surface shadow-colored border border-white/40">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/30 via-transparent to-white/10 pointer-events-none"></div>
+          <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 text-xs font-semibold text-pink-700">
+                ✨ Campaign Builder
+              </div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                Create campaigns people will love
+              </h1>
+              <p className="text-sm md:text-base text-muted-contrast max-w-3xl">
+                Set your tone, choose platforms, and let AI handle the heavy lifting. Keep everything readable with the new soft blush background and glass surfaces.
+              </p>
+              <div className="flex flex-wrap gap-2 text-xs md:text-sm">
+                <span className="px-3 py-1 rounded-full bg-white/70 text-pink-700 font-semibold">Mode: {mode === "easy" ? "Basic" : "Advanced"}</span>
+                <span className="px-3 py-1 rounded-full bg-white/70 text-purple-700 font-semibold">Posts: {numPosts || 0}</span>
+                <span className="px-3 py-1 rounded-full bg-white/70 text-indigo-700 font-semibold">Platforms: {selectedPlatforms.length || 0}</span>
+              </div>
             </div>
-          </div>
-          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm min-w-[220px]">
-            <div className="text-xs font-medium text-[var(--text-muted)] mb-1">Current step</div>
-            <div className="font-semibold text-[var(--text)]">
-              {mode === "easy" ? "Generate & schedule" : "Generate captions"}
+            <div className="flex flex-col gap-3 min-w-[220px]">
+              <div className="rounded-xl bg-white/70 p-3 shadow-sm border border-white/50">
+                <div className="text-xs font-semibold text-muted-contrast mb-1">Current step</div>
+                <div className="text-lg font-bold text-contrast">
+                  {mode === "easy" ? "Generate & schedule" : "Generate captions"}
+                </div>
+                <div className="text-xs text-muted-contrast">Stay on this page — progress is autosaved in the store.</div>
+              </div>
+              <div className="rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 p-3 text-white shadow-colored-lg">
+                <div className="text-xs font-semibold opacity-90">Tip</div>
+                <div className="text-sm font-semibold">Keep descriptions concise; we’ll expand with AI.</div>
+              </div>
             </div>
-            <div className="text-xs text-[var(--text-muted)] mt-0.5">Progress is saved as you go.</div>
           </div>
         </div>
 
@@ -1346,7 +1369,7 @@ function CreateCampaign() {
               <div className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Flame className="w-5 h-5 text-orange-600" aria-hidden="true" />
+                    <span className="text-orange-600 text-lg">🔥</span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-orange-900 text-sm">Creating from Trending Topic</h3>
@@ -1434,15 +1457,58 @@ function CreateCampaign() {
                         value="image"
                         checked={assetType === "image"}
                         onChange={(e) => {
-                          console.log(`Asset type changed to: ${e.target.value}`);
+                          console.log(`🖼️ Asset type changed to: ${e.target.value}`);
                           setAssetType(e.target.value);
                         }}
                         className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                         disabled={creating}
                       />
-                      <span className="text-sm font-medium">Generate images</span>
+                      <span className="text-sm font-medium">🖼️ Generate Images</span>
                     </label>
+                    {/* VIDEO GENERATION OPTION - COMMENTED OUT FOR NOW */}
+                    {/* <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="asset-type-basic"
+                        value="video"
+                        checked={assetType === "video"}
+                        onChange={(e) => {
+                          console.log(`🎬 Asset type changed to: ${e.target.value}`);
+                          setAssetType(e.target.value);
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                        disabled={creating}
+                      />
+                      <span className="text-sm font-medium">🎬 Generate 30-Second Videos</span>
+                    </label> */}
                   </div>
+                  {/* VIDEO MODE INSTRUCTIONS - COMMENTED OUT FOR NOW */}
+                  {/* {assetType === "video" && (
+                    <div className="mt-3 p-3 bg-purple-100 border-2 border-purple-400 rounded-lg">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">✅</span>
+                        <p className="text-xs font-bold text-purple-900">VIDEO MODE SELECTED</p>
+                      </div>
+                      <p className="text-xs font-semibold text-purple-900 mb-2">📋 Steps to Generate 30-Second Videos:</p>
+                      <ol className="text-xs text-purple-800 space-y-1.5 list-decimal list-inside ml-2">
+                        <li><strong>✅ Step 1:</strong> You've selected "🎬 Generate 30-Second Videos" (current step)</li>
+                        <li><strong>Step 2:</strong> Fill in campaign details above (name, description, days, number of posts)</li>
+                        <li><strong>Step 3:</strong> Click the "Create Posts with Videos" button below</li>
+                        <li><strong>Step 4:</strong> Wait for videos to generate (takes longer than images - be patient!)</li>
+                        <li><strong>Step 5:</strong> Videos will appear in preview with play controls showing time</li>
+                      </ol>
+                      <div className="mt-2 p-2 bg-purple-200 rounded border border-purple-300">
+                        <p className="text-xs font-semibold text-purple-900">💡 How Videos Work:</p>
+                        <p className="text-xs text-purple-800 mt-1">
+                          • Uses Hugging Face Inference API with open-source text-to-video models<br/>
+                          • Models: Zeroscope, ModelScope, or other free video generation models<br/>
+                          • Direct text-to-video generation (not image conversion)<br/>
+                          • 100% free, open-source, no API costs<br/>
+                          • Fallback: If API fails, creates animated video from generated image
+                        </p>
+                      </div>
+                    </div>
+                  )} */}
                   {assetType === "image" && (
                     <p className="text-xs text-blue-700 mt-2">
                       Images will be generated using the selected provider (Stability, ChatGPT, or Nano Banana).
@@ -1554,8 +1620,20 @@ function CreateCampaign() {
                             onChange={(e) => updateAssetSelection(index, e.target.value)}
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
-                          <span className="text-sm">AI generated image</span>
+                          <span className="text-sm">🤖 AI Generated Image</span>
                         </label>
+                        {/* VIDEO GENERATION OPTION - COMMENTED OUT FOR NOW */}
+                        {/* <label className="flex items-center space-x-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name={`asset-type-${index}`}
+                            value="video"
+                            checked={assetSelections[index] === "video"}
+                            onChange={(e) => updateAssetSelection(index, e.target.value)}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="text-sm">🎬 AI Generated Video (30s)</span>
+                        </label> */}
                         <label className="flex items-center space-x-2 cursor-pointer">
                           <input
                             type="radio"
@@ -1569,6 +1647,47 @@ function CreateCampaign() {
                         </label>
                       </div>
 
+                      {/* VIDEO GENERATION AREA - COMMENTED OUT FOR NOW */}
+                      {/* {assetSelections[index] === "video" && (
+                        <div className="space-y-2">
+                          {generatedVideos[index] ? (
+                            <div className="border border-gray-200 rounded-lg p-3 bg-green-50">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                  <video
+                                    src={apiUrl(generatedVideos[index])}
+                                    className="w-24 h-24 object-cover rounded"
+                                    controls
+                                    muted
+                                  />
+                                  <div>
+                                    <p className="text-sm font-medium text-green-800">30-second video</p>
+                                    <p className="text-xs text-green-600">✅ Video generated successfully</p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    setGeneratedVideos(prev => {
+                                      const newVideos = { ...prev };
+                                      delete newVideos[index];
+                                      return newVideos;
+                                    });
+                                    updateAssetSelection(index, "ai");
+                                  }}
+                                  className="text-red-500 hover:text-red-700 text-sm"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-purple-300 rounded-lg p-4 text-center bg-purple-50">
+                              <p className="text-sm text-purple-800 mb-2">🎬 Video will be generated when you click "Create Posts"</p>
+                              <p className="text-xs text-purple-600">30-second AI-generated video will be created</p>
+                            </div>
+                          )}
+                        </div>
+                      )} */}
 
                       {/* Image Upload Area - Inline */}
                       {assetSelections[index] === "custom" && (
@@ -1584,7 +1703,7 @@ function CreateCampaign() {
                                   />
                                   <div>
                                     <p className="text-sm font-medium text-green-800">{uploadedImages[index].name}</p>
-                                    <p className="text-xs text-green-600">Image uploaded</p>
+                                    <p className="text-xs text-green-600">✅ Image uploaded successfully</p>
                                   </div>
                                 </div>
                                 <button
@@ -1771,16 +1890,12 @@ function CreateCampaign() {
                             onClick={scheduleBatch}
                             size="lg"
                             className="px-8 py-3"
-                            disabled={scheduling || selectedPlatforms.length === 0 || isGuest}
+                            disabled={scheduling || selectedPlatforms.length === 0}
                           >
                             {scheduling ? "Scheduling Posts..." : "Schedule All Posts"}
                           </Button>
                         </div>
-                        {isGuest ? (
-                          <p className="text-xs text-gray-500 text-center mt-2">
-                            Scheduling is disabled for guests. Create a free account to schedule posts.
-                          </p>
-                        ) : selectedPlatforms.length === 0 && (
+                        {selectedPlatforms.length === 0 && (
                           <p className="text-xs text-gray-500 text-center mt-2">
                             Select at least one platform to enable scheduling
                           </p>
@@ -1918,15 +2033,13 @@ function CreateCampaign() {
                             onClick={scheduleSelectedPosts}
                             size="lg"
                             className="px-8 py-3"
-                            disabled={scheduling || isGuest}
+                            disabled={scheduling}
                           >
                             {scheduling ? "Scheduling Selected Posts..." : "Schedule Selected Posts"}
                           </Button>
                         </div>
                         <p className="text-xs text-gray-500 text-center mt-2">
-                          {isGuest
-                            ? "Scheduling is disabled for guests. Create a free account to schedule posts."
-                            : "Only posts with selected platforms will be scheduled"}
+                          Only posts with selected platforms will be scheduled
                         </p>
                       </div>
                     )}
@@ -2047,7 +2160,7 @@ function CreateCampaign() {
                         })()
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          <ImageIcon className="w-10 h-10" aria-hidden="true" />
+                          <div className="text-4xl">🖼️</div>
                         </div>
                       )}
                     </div>
@@ -2070,7 +2183,7 @@ function CreateCampaign() {
                       )}
                       {item.scheduledAt && (
                         <div className="text-xs text-green-600">
-                          Scheduled: {format(new Date(item.scheduledAt), "MMM d, h:mm a")}
+                          📅 Scheduled: {format(new Date(item.scheduledAt), "MMM d, h:mm a")}
                         </div>
                       )}
                     </div>
@@ -2101,7 +2214,7 @@ function CreateCampaign() {
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Target className="w-4 h-4 text-blue-600" aria-hidden="true" />
+                      <span className="text-blue-600 text-sm">🎯</span>
                     </div>
                     <h3 className="font-semibold text-blue-900">Choose Different Platforms for Each Post</h3>
                   </div>

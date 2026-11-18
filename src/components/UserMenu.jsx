@@ -49,7 +49,7 @@ function UserMenu() {
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface)] transition-colors"
             >
-                <div className="w-8 h-8 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gradient-primary-start to-gradient-primary-end flex items-center justify-center">
                     {user.picture_url && !imageError ? (
                         <img
                             src={user.picture_url}
@@ -73,7 +73,7 @@ function UserMenu() {
                 <div className="absolute right-0 bottom-full mb-2 w-64 bg-[var(--surface)] border border-[var(--border)] rounded-lg shadow-lg z-50">
                     <div className="p-4 border-b border-[var(--border)]">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gradient-primary-start to-gradient-primary-end flex items-center justify-center">
                                 {user.picture_url && !imageError ? (
                                     <img
                                         src={user.picture_url}

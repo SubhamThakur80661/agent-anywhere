@@ -66,7 +66,7 @@ const PostEventModal = ({
             // Prefer campaign_name (Basic mode campaign name); fallback to description snippet
             title: postDataResp.post.campaign_name && postDataResp.post.campaign_name.trim()
               ? postDataResp.post.campaign_name.trim()
-              : `${postDataResp.post.original_description?.substring(0, 50)}...`,
+              : `📱 ${postDataResp.post.original_description?.substring(0, 50)}...`,
             description: postDataResp.post.caption || postDataResp.post.original_description,
             image_url: postDataResp.post.image_path || postDataResp.post.image_url || ""
           }));
@@ -88,7 +88,7 @@ const PostEventModal = ({
             // Prefer campaign_name for Basic mode; fallback to description snippet
             title: p.campaign_name && p.campaign_name.trim()
               ? p.campaign_name.trim()
-              : `${p.original_description?.substring(0, 50)}...`,
+              : `📱 ${p.original_description?.substring(0, 50)}...`,
             description: p.caption || p.original_description,
             image_url: p.image_path || p.image_url || ""
           }));
@@ -470,7 +470,7 @@ const PostEventModal = ({
                     style={{ display: 'none' }}
                   >
                     <div className="text-center">
-                      
+                      <div className="text-xl mb-1">🖼️</div>
                       <div className="text-xs">Image not available</div>
                     </div>
                   </div>
@@ -676,7 +676,7 @@ const PostEventModal = ({
                     className="w-full p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
                   >
                     <div className="flex items-center space-x-3">
-                      
+                      <div className="text-2xl">🤖</div>
                       <div>
                         <div className="font-medium text-gray-900">Create with AI</div>
                         <div className="text-sm text-gray-500">Generate new image using AI based on description</div>
@@ -700,7 +700,7 @@ const PostEventModal = ({
               ) : imageEditMode === 'ai' ? (
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 mb-4">
-                    
+                    <div className="text-2xl">🤖</div>
                     <div>
                       <div className="font-medium text-gray-900">Generate AI Image</div>
                       <div className="text-sm text-gray-500">Create a new image using AI</div>

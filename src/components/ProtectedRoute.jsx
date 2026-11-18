@@ -17,7 +17,7 @@ function ProtectedRoute({ children }) {
     // Show loading spinner while checking authentication
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+            <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-8 h-8 animate-spin text-[var(--primary)] mx-auto mb-4" />
                     <p className="text-[var(--text-muted)]">Loading...</p>

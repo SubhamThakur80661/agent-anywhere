@@ -74,7 +74,7 @@ export function TierProgress({ balance = 0 }) {
   if (!nextTier) {
     return (
       <div className="text-center py-2">
-        <p className="text-amber-400 text-sm font-medium">Maximum tier reached</p>
+        <p className="text-amber-400 text-sm font-medium">🎉 Maximum tier reached!</p>
       </div>
     );
   }

@@ -234,7 +234,7 @@ const GoogleCalendarIntegration = ({ campaigns = [], onEventCreated, onOpenCalen
     <div className="space-y-4">
       <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900/60 rounded-lg border border-gray-200/60 dark:border-slate-700/60">
         <div className="flex items-center space-x-3">
-          
+          <div className="text-2xl">📅</div>
           <div>
             <h3 className="font-medium text-gray-900 dark:text-slate-50">Google Calendar Integration</h3>
             <p className="text-sm text-gray-600 dark:text-slate-300">
@@ -299,7 +299,7 @@ const GoogleCalendarIntegration = ({ campaigns = [], onEventCreated, onOpenCalen
                     {campaign.productDescription || campaign.description || campaign.id}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-slate-300">
-                    {new Date(campaign.scheduledAt).toLocaleString()}
+                    📅 {new Date(campaign.scheduledAt).toLocaleString()}
                   </div>
                 </div>
                 <Button
@@ -377,7 +377,7 @@ const GoogleCalendarIntegration = ({ campaigns = [], onEventCreated, onOpenCalen
                         ))}
                         {p.scheduledAt && (
                           <span className="text-[10px] text-gray-500 dark:text-slate-300">
-                            {new Date(p.scheduledAt).toLocaleString()}
+                            📅 {new Date(p.scheduledAt).toLocaleString()}
                           </span>
                         )}
                         {p.status && (

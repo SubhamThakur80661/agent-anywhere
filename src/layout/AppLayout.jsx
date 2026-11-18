@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
 import Footer from "../components/ui/Footer.jsx";
+import CalendarPicker from "../components/ui/CalendarPicker.jsx";
 import { useAuthStore } from "../store/authStore.js";
 
 function AppLayout({ children }) {
@@ -9,19 +9,20 @@ function AppLayout({ children }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main id="main" className="flex-1 ml-[260px] relative" role="main">
+      <main id="main" className="flex-1 ml-[280px] relative" role="main">
         <div className="max-w-screen-2xl mx-auto px-6 lg:px-8 py-6">
+
           {isGuest && (
-            <div className="guest-banner mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3 text-sm">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-800 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200">
               <p>
                 You&apos;re browsing as a guest. Connecting accounts and publishing are disabled in guest mode.
               </p>
-              <Link to="/register" className="font-medium text-[var(--primary)] hover:underline">
-                Create a free account
-              </Link>
+              <a href="/register" className="font-medium underline underline-offset-2">Create a free account</a>
             </div>
           )}
-          <div className="animate-slide-in flex flex-col min-h-[calc(100vh-8rem)]">
+
+          {/* Glass morphism content wrapper */}
+          <div className="glass rounded-3xl p-6 md:p-8 min-h-[calc(100vh-8rem)] animate-slide-in flex flex-col">
             <div className="flex-1">
               {children}
             </div>
@@ -34,3 +35,5 @@ function AppLayout({ children }) {
 }
 
 export default AppLayout;
+
+
